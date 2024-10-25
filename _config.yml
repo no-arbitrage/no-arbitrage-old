@@ -25,7 +25,7 @@
 # in the templates via {{ site.myvariable }}.
 
 title: No Arbitrage
-email: your-email@domain.com
+email: no
 author: Joseph Cai
 subtitle: Joseph Cai's Blog for Money and Growth.
 theme: jekyll-theme-yat
@@ -42,7 +42,7 @@ theme: jekyll-theme-yat
 #   "Copyright (c) 2017-{currentYear} <a href="https://example.com">{author}</a>"
 #   "Copyright © 2017-2021 Foobar"
 #
-copyright: "Copyright (c) No Arbitrage {author} (2023-{currentYear})."
+copyright: "Copyright (c) No Arbitrage (2023-{currentYear}) by {author}."
 
 description: >- # this means to ignore newlines until "baseurl:"
   No Arbitrate is a personal blog created to share practical financial knowledge, 
@@ -51,7 +51,8 @@ description: >- # this means to ignore newlines until "baseurl:"
   
 banner: "/assets/images/banners/home.jpeg"
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://no-arbitrage.github.io" # the base hostname & protocol for your site, e.g. https://example.com
+repo_url: "https://no-arbitrage.github.io" # the base hostname & protocol for your site, e.g. https://example.com
+url: "https://www.no-arbitrage.com"
 favicon: "/assets/images/brand/favicon.ico" # the favicon for your site
 page_excerpts: true
 # Yat date format
@@ -158,12 +159,14 @@ brand_color: greenblue
 
 # If you want to link only specific pages in your header, uncomment
 # this and add the path to the pages in order as they should show up
-# header_pages:
-#   - index.html
-#   - archives.html
-#   - categories.html
-#   - tags.html
-#   - about.md
+header_pages:
+  - home.html
+  - about.md
+  - categories.html
+  - tags.html
+  - index.html#  
+  - archives.html
+
 
 # Page default value
 # defaults:
@@ -197,7 +200,7 @@ brand_color: greenblue
 #   text_size: 350          # Words default size
 
 # Pagination setting
-# paginate: 5
+paginate: 5
 
 # Photo previewer settings (PhotoSwipe 5)
 # the options please refer to: https://photoswipe.com/options/
@@ -227,9 +230,9 @@ brand_color: greenblue
 # Gitment comments
 gitment:
   username: "no-arbitrage"
-  repo: "no-arbitrage.github.io"
-  client_id: "Ov23li28eOEyi3EjeRw9"
-  client_secret: "6e5dbf825e7442ec8557cdad31a871db532b9efe"
+  repo: "https://github.com/no-arbitrage/no-arbitrage-gitment"
+  client_id: "Ov23liaJIUi4yWAZdCZc"
+  client_secret: "f9c589c45c16fba57503555627545c846688dc8a"
   redirect_uri: "https://www.no-arbitrage.com"   # If you use a custom domain name
 
 # Utterances comments
