@@ -228,25 +228,35 @@ paginate: 5
 #   shortname: "noarbitrage"
 
 # Gitment comments
-gitment:
-  username: "no-arbitrage"
-  repo: "no-arbitrage.github.io"
-  client_id: "Ov23li28eOEyi3EjeRw9"
-  client_secret: "6e5dbf825e7442ec8557cdad31a871db532b9efe"
-  redirect_uri: "https://www.no-arbitrage.com"   # If you use a custom domain name
+# gitment:
+#   username: "no-arbitrage"
+#   repo: "no-arbitrage.github.io"
+#   client_id: "Ov23li28eOEyi3EjeRw9"
+#   client_secret: "6e5dbf825e7442ec8557cdad31a871db532b9efe"
+#   redirect_uri: "https://www.no-arbitrage.com"   # If you use a custom domain name
+
 # Utterances comments
 # See https://utteranc.es/
 # set follow_site_theme true to make utterances' theme follow the site's
 
-# utterances:
-#   repo: "owner/repo"
-#   issue_term: "title"
-#   label: "utterances comment"
-#   theme: "github-light"
-#   follow_site_theme: true
+# <script src="https://utteranc.es/client.js"
+#         repo="no-arbitrage/no-arbitrage.github.io"
+#         issue-term="title"
+#         label="📢admin"
+#         theme="preferred-color-scheme"
+#         crossorigin="anonymous"
+#         async>
+# </script>
+
+utterances:
+  repo: "no-arbitrage/no-arbitrage.github.io"
+  issue_term: "title"
+  label: "📢admin"
+  theme: "preferred-color-scheme"
+  follow_site_theme: true
 
 # Build settings
-# highlighter: none
+highlighter: true
 markdown: kramdown
 kramdown:
   input: GFM
