@@ -18,6 +18,7 @@ html {
       &.site-header {
         .site-brand-inner, .page-link {
           color: #fff;
+
           transition: 0.1s color;
         }
 
@@ -97,8 +98,9 @@ html {
 
   .site-brand-inner {
     @include relative-font-size(1.125);
+    text-shadow: 1px 1px 2px black;
     font-weight: $base-font-weight;
-    letter-spacing: -1px;
+    // letter-spacing: 0px;
     transition: 0.1s filter color;
 
     &, &:visited {
@@ -114,7 +116,7 @@ html {
 }
 
 .site-nav {
-  @include relative-font-size(1.125);
+  @include relative-font-size(1.1);
   line-height: $header-height;
   position: absolute;
   right: 0;

@@ -165,7 +165,7 @@ header_pages:
   - tags.html
   - index.html
   - archives.html
-
+  - resource.html
 
 # Page default value
 defaults:
