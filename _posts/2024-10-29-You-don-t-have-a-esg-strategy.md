@@ -3,9 +3,8 @@ layout: post
 title: You Don’t Have an ESG Strategy
 subtitle: You Don’t Have an ESG Strategy—What You’ve Been Sold Is ESG Planning.
 categories: ESG CorporateStrategy
-banner:: "assets/images/banners/Ethics-and-the-Conscience.jpg"
 excerpt_image: https://github.com/jeffreytse/jekyll-theme-yat/assets/9413601/2ed22d49-90b1-4f7e-8e8f-b77b21dee505
-tags: ESG 
+tags: [ESG]
 ---
 
 
