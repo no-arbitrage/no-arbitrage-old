@@ -4,10 +4,10 @@ title: Unlocking cross sales opportunities with pre-made Basket Analysis templat
 subtitle: Basket Analysis for Sales Managers
 categories: data
 excerpt_image: "/assets/images/posts/jacek-dylag-jo8C9bt3uo8-unsplash.jpg"
-banner: "/assets/images/posts/jacek-dylag-jo8C9bt3uo8-unsplash.jpg"
+
 tags: [basket-analysis, excel, templates]
 ---
-
+![banner](/assets/images/posts/jacek-dylag-jo8C9bt3uo8-unsplash.jpg)
 Images: Jacek Dylag (unsplash.com)
 
 ## Goal

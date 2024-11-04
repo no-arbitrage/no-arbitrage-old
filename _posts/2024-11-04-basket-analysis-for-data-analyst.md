@@ -4,9 +4,11 @@ title: Implementing Basket Analysis in Power BI and SQL - Association rule
 subtitle: Basket Analysis for Data analyst
 categories: data
 excerpt_image: "assets/images/posts/heidi-fin-2TLREZi7BUg-unsplash.jpg"
-banner: "assets/images/posts/heidi-fin-2TLREZi7BUg-unsplash.jpg"
+
 tags: [basket-analysis, excel, templates]
 ---
+
+![banner](/assets/images/posts/heidi-fin-2TLREZi7BUg-unsplash.jpg)
 
 Images: Heidi Fin (unsplash.com)
 

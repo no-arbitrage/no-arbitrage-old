@@ -4,9 +4,10 @@ title: Calculating Returns
 subtitle: Do you know what does APR on your credit mean?
 categories: finance
 excerpt_image: "assets/images/posts/kenny-eliason-maJDOJSmMoo-unsplash.jpg"
-banner: "assets/images/posts/kenny-eliason-maJDOJSmMoo-unsplash.jpg"
+
 tags: [book, return, fixed-income]
 ---
+![banner](/assets/images/posts/kenny-eliason-maJDOJSmMoo-unsplash.jpg)
 
 Images: kenny-eliason (unsplash.com)
 
