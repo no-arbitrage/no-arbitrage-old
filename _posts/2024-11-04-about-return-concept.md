@@ -8,7 +8,7 @@ banner: "assets/images/posts/kenny-eliason-maJDOJSmMoo-unsplash.jpg"
 tags: [book, return, fixed-income]
 ---
 
-Images: Jacek Dylag (unsplash.com)
+Images: kenny-eliason (unsplash.com)
 
 # Motivation
 
