@@ -106,6 +106,10 @@ If you would like to use my method, you can copy past the csv data to replace th
 PowerQuery code is here ( in case you are interested).  I’ve wrote my own code to make this query dynamic, able to process your custom data, most likely with different table headings (asset tickers) from mine.  
 
 ```jsx
+{% raw %}
+{{"Date.1", type date}}
+
+
 let
     Source = Excel.CurrentWorkbook(){[Name="Table2"]}[Content],
     Splitbydelimiter = Table.SplitColumn(Source, "Date", Splitter.SplitTextByEachDelimiter({" "}, QuoteStyle.Csv, false), {"Date.1", "Date.2"}),
@@ -116,9 +120,11 @@ let
     transform = List.Transform( columnheader, each {_, type number} ),
   
     TypeChange = Table.TransformColumnTypes(withDates,transform),
-    TypeChange2 = Table.TransformColumnTypes(TypeChange,{{"Date.1", type date}})
+    TypeChange2 = Table.TransformColumnTypes(TypeChange, {% raw %} {{"Date.1",type date}}) {% endraw %}
 in
     TypeChange2
+
+
 ```
 
 ### Step #3 : Using Solver to get the allocation.
