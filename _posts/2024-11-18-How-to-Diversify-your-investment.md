@@ -279,7 +279,7 @@ Then, go straight to the point!
 - Constraints: based on traditional insights to have set some guideline limits for each portfolio asset, for example, no asset should have a weight that’s 10x time than the smallest asset in the portfolio.
 - Solving method
 
-Comparing Simplex, GRG Non-Linear and Evolution method in Excel Solver (Perplexity)
+[Comparing Simplex, GRG Non-Linear and Evolution method in Excel Solver.](https://no-arbitrage.com/operational-reasearch/2024/11/17/comparing-solvers-in-excel)
 
 ## Closing Note
 
