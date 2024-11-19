@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Free Power Bi template - a showcase of dashboard development
-categories: data, showcase
-excerpt_image: "assets/images/screenshot/241104_powerbi_Slide3.PNG"
+categories: data
+excerpt_image: "assets/images/screenshot/241104_powerbi_Slide3.jpeg"
 banner: "assets/images/banners/home-original.jpeg"
 tags: [basket-analysis, excel, templates]
 top: 1
