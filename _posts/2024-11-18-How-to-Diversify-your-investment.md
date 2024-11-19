@@ -107,9 +107,6 @@ PowerQuery code is here ( in case you are interested).  I’ve wrote my own code
 
 ```jsx
 {% raw %}
-{{"Date.1", type date}}
-
-
 let
     Source = Excel.CurrentWorkbook(){[Name="Table2"]}[Content],
     Splitbydelimiter = Table.SplitColumn(Source, "Date", Splitter.SplitTextByEachDelimiter({" "}, QuoteStyle.Csv, false), {"Date.1", "Date.2"}),
@@ -120,11 +117,10 @@ let
     transform = List.Transform( columnheader, each {_, type number} ),
   
     TypeChange = Table.TransformColumnTypes(withDates,transform),
-    TypeChange2 = Table.TransformColumnTypes(TypeChange, {% raw %} {{"Date.1",type date}}) {% endraw %}
+    TypeChange2 = Table.TransformColumnTypes(TypeChange,  {{"Date.1",type date}}) 
 in
     TypeChange2
-
-
+{% endraw %}
 ```
 
 ### Step #3 : Using Solver to get the allocation.
