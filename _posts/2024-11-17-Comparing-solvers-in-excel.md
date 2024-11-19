@@ -3,13 +3,12 @@ layout: post
 title: Comparing Default Solvers in Excel
 subtitle: Simplex is more likely to be the best option.
 categories: operational-reasearch
-excerpt_image: "assets/images/posts/post-image/masiac art/404.jpg"
+excerpt_image: "assets/images/posts/post-image/masiac-art/404.jpg"
 
 tags: [book, return, fixed-income]
 ---
-![banner](/assets/images/posts/post-image/masiac art/404.jpg)
+![banner](/assets/images/posts/post-image/masiac-art/404.jpg)
 
-Images: kenny-eliason (unsplash.com)
 ## **Simplex Method**
 
 - Used for linear optimization problems
