@@ -172,7 +172,7 @@ M834 80h400000v40h-400000z'/></svg></span></span></span><span class="vlist-s">�
 
 - Additive . the mathematically property of log provides us the ability to link period return by summing them instead of using geographic linking.
 - Asset return is not normally distributed. It typically has a fat left tail and think right tail  in real world
-- This form is also widely used in derivative market where interest rate compounding period is assumed to be infinite. and you have \( P_0 \cdot e^{E(R)T} = P_1 \)
+- This form is also widely used in derivative market where interest rate compounding period is assumed to be infinite. and you have $ P_0 \cdot e^{E(R)T} = P_1 $
 
 
 ### Discussion #2:  Daily Adjusted Closing Price
@@ -202,14 +202,19 @@ This measure captures the variation of returns.  This measure has many flaws.
 
 Example of Covariance Matrix
 
-\[
+\
 \Sigma =
 \begin{bmatrix}
 \sigma_{1}^2 & \sigma_{12} & \sigma_{13} \\
 \sigma_{12} & \sigma_{2}^2 & \sigma_{23} \\
 \sigma_{13} & \sigma_{23} & \sigma_{3}^2
 \end{bmatrix}
-\]
+\
+
+Variance is defined as $V(x)=\frac{1}{N-1}\Sigma(x_i-μ)^2$
+Covariance between two random variables x and y (or columns of a matrix) is defined as $Cov(x,y)= \frac{1}{N-1} \Sigma (x_i−μ_x)(y_i−μ_y) $  and $Cov(x,x)=V(x)$
+
+The term covariance matrix may be misleading to you. It is not any sort of a special matrix. It is simply set of variances and covariances between pairs of columns. A position of any element in the covariance matrix corresponds to variance/covariance between a pair of two columns, e.g. a number located in 3rd row and 2nd column in the covariance matrix represents covariance between 3rd and 2nd columns of matrix A. $Cov(x,y)=Cov(y,x)$ , therefore covariance matrix is symmetric.
 
 - For N asset portfolio, you will have N x N covariance matrix.
 - Any [covariance](https://en.wikipedia.org/wiki/Covariance) matrix is [symmetric](https://en.wikipedia.org/wiki/Symmetric_matrix) and [positive semi-definite](https://en.wikipedia.org/wiki/Positive_semi-definite_matrix) and its main diagonal contains [variances](https://en.wikipedia.org/wiki/Variance).
