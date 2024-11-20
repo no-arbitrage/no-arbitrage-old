@@ -3,11 +3,11 @@ layout: post
 title: Comparing Default Solvers in Excel
 subtitle: Simplex is more likely to be the best option.
 categories: operational-reasearch
-excerpt_image: "assets/images/posts/post-image/masiac-art/404.jpg"
+excerpt_image: "assets/images/solver.png"
 
 tags: [book, return, fixed-income]
 ---
-![banner](/assets/images/posts/post-image/masiac-art/404.jpg)
+![banner](/assets/images/solver.png)
 
 ## **Simplex Method**
 

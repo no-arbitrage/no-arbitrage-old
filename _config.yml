@@ -45,9 +45,10 @@ theme: jekyll-theme-yat
 copyright: "Copyright (c) No Arbitrage (2023-{currentYear}) by {author}."
 
 description: >- # this means to ignore newlines until "baseurl:"
-  No Arbitrate is a personal blog created to share practical financial knowledge,
-  ranging from basics to advanced concepts, and from theory to hands-on spreadsheet techniques.
-  A space for exchanging ideas, making connections, and inspiring each others.
+  No Arbitrate is a personal blog created to share practical data analytical and financial knowledge,
+  ranging from basics theory to advanced concepts,  from hands-on spreadsheet techniques to plug-and-play practical templates.
+  A space for exchanging ideas, making connections, and inspiring each others. 
+  I also post my own or borrowed throughts on ESG sustainability subjects.
 
 baseurl: "" # the subpath of your site, e.g. /blog
 repo_url: "https://no-arbitrage.github.io" # the base hostname & protocol for your site, e.g. https://example.com
