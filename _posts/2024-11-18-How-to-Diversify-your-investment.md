@@ -172,7 +172,7 @@ M834 80h400000v40h-400000z'/></svg></span></span></span><span class="vlist-s">�
 
 - Additive . the mathematically property of log provides us the ability to link period return by summing them instead of using geographic linking.
 - Asset return is not normally distributed. It typically has a fat left tail and think right tail  in real world
-- This form is also widely used in derivative market where interest rate compounding period is assumed to be infinite. and you have {% katex %}P_0 \cdot e^{E(R)T} = P_1{% endkatex %}
+- This form is also widely used in derivative market where interest rate compounding period is assumed to be infinite. and you have \( P_0 \cdot e^{E(R)T} = P_1 \)
 
 
 ### Discussion #2:  Daily Adjusted Closing Price
@@ -202,12 +202,14 @@ This measure captures the variation of returns.  This measure has many flaws.
 
 Example of Covariance Matrix
 
-{% katex %}\Sigma =
+\[
+\Sigma =
 \begin{bmatrix}
 \sigma_{1}^2 & \sigma_{12} & \sigma_{13} \\
 \sigma_{12} & \sigma_{2}^2 & \sigma_{23} \\
 \sigma_{13} & \sigma_{23} & \sigma_{3}^2
-\end{bmatrix}{% endkatex %} 
+\end{bmatrix}
+\]
 
 - For N asset portfolio, you will have N x N covariance matrix.
 - Any [covariance](https://en.wikipedia.org/wiki/Covariance) matrix is [symmetric](https://en.wikipedia.org/wiki/Symmetric_matrix) and [positive semi-definite](https://en.wikipedia.org/wiki/Positive_semi-definite_matrix) and its main diagonal contains [variances](https://en.wikipedia.org/wiki/Variance).

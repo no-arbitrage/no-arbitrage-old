@@ -265,14 +265,14 @@ kramdown:
 
 
 
-katex:
-  # js_path: "{{ Gem::lib_path }}/assets/js"  # Path used to search for katex.min.js
-  js: "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"
-  css: "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"
-  rendering_options:
-    # Default KaTeX rendering options. See https://github.com/Khan/KaTeX#rendering-options
-    throw_error: true                       # throwOnError - set to false if you want rendering to output error as text rather than a build error
-    error_color: "#cc0000"                  # errorColor
+# katex:
+#   # js_path: "{{ Gem::lib_path }}/assets/js"  # Path used to search for katex.min.js
+#   js: "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"
+#   css: "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"
+#   rendering_options:
+#     # Default KaTeX rendering options. See https://github.com/Khan/KaTeX#rendering-options
+#     throw_error: true                       # throwOnError - set to false if you want rendering to output error as text rather than a build error
+#     error_color: "#cc0000"                  # errorColor
 
 
 plugins:
@@ -281,6 +281,6 @@ plugins:
   - jekyll-sitemap
   - jekyll-paginate
   - jekyll-spaceship
-  - jekyll-katex
+#  - jekyll-katex
 
 
