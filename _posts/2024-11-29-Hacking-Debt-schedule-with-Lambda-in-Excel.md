@@ -19,13 +19,13 @@ Create a lambda function as below.
 
 ## Syntax
 DebtSchedule(
-  [OpenBalance] = Debt Open Balance,
-  [CashBalance] = Cash Open Balance,
-  [CFArray] = Cashflow Array,
-  [MandatoryAmort] = Mandatory Amortisation,
-  [CashSweep] = % of available cash after mandatory amortisation allocated to optional amortisation,
-  [PIKInterest] = PIK Interest, applied to the opening balance instead of the average balance,
-  [CashInterest] = Cash interest applied to the average balance,
+  [OpenBalance] = Debt Open Balance,\n
+  [CashBalance] = Cash Open Balance,\n
+  [CFArray] = Cashflow Array,\n
+  [MandatoryAmort] = Mandatory Amortisation,\n
+  [CashSweep] = % of available cash after mandatory amortisation allocated to optional amortisation,\n
+  [PIKInterest] = PIK Interest, applied to the opening balance instead of the average balance,\n
+  [CashInterest] = Cash interest applied to the average balance,\n
 ) 
 
 # Activate Advanced Formula Environment
