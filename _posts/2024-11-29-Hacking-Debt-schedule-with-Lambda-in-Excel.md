@@ -4,7 +4,7 @@ title:  Hacking Debt schedule with Lambda in Excel
 subtitle: One formula to quickly craft debt schedule with multiple features
 categories: finance
 excerpt_image: assets/images/abstract-shapes/creatvise-NoTX005dHhs-unsplash.jpg
-banner: : assets/images/abstract-shapes/creatvise-NoTX005dHhs-unsplash.jpg
+banner: assets/images/abstract-shapes/creatvise-NoTX005dHhs-unsplash.jpg
 tags: [template, return, portfolio, finance, diversification]
 ---
 
