@@ -1,0 +1,1059 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://no-arbitrage.github.io/no-arbitrage-old//feed.xml" rel="self" type="application/atom+xml" /><link href="https://no-arbitrage.github.io/no-arbitrage-old//" rel="alternate" type="text/html" /><updated>2025-02-25T16:04:43+00:00</updated><id>https://no-arbitrage.github.io/no-arbitrage-old//feed.xml</id><title type="html">No Arbitrage</title><subtitle>No Arbitrate is a personal blog created to share practical data analytical and financial knowledge, ranging from basics theory to advanced concepts,  from hands-on spreadsheet techniques to plug-and-play practical templates. A space for exchanging ideas, making connections, and inspiring each others.  I also post my own or borrowed throughts on ESG sustainability subjects.</subtitle><author><name>Joseph Cai</name></author><entry><title type="html">Hacking Debt schedule with Lambda in Excel</title><link href="https://no-arbitrage.github.io/no-arbitrage-old//finance/2024/11/29/Hacking-Debt-schedule-with-Lambda-in-Excel.html" rel="alternate" type="text/html" title="Hacking Debt schedule with Lambda in Excel" /><published>2024-11-29T00:00:00+00:00</published><updated>2024-11-29T00:00:00+00:00</updated><id>https://no-arbitrage.github.io/no-arbitrage-old//finance/2024/11/29/Hacking-Debt-schedule-with-Lambda-in-Excel</id><content type="html" xml:base="https://no-arbitrage.github.io/no-arbitrage-old//finance/2024/11/29/Hacking-Debt-schedule-with-Lambda-in-Excel.html"><![CDATA[<p>How to use one single formula to hack Debt schedule with CashSweep</p>
+
+<p>Create a lambda function as below.</p>
+
+<h2 id="syntax">Syntax</h2>
+<p>DebtSchedule(
+  [OpenBalance] = Debt Open Balance,<br />
+  [CashBalance] = Cash Open Balance,<br />
+  [CFArray] = Cashflow Array,<br />
+  [MandatoryAmort] = Mandatory Amortisation,<br />
+  [CashSweep] = % of available cash after mandatory amortisation allocated to optional amortisation,<br />
+  [PIKInterest] = PIK Interest, applied to the opening balance instead of the average balance,<br />
+  [CashInterest] = Cash interest applied to the average balance,<br />
+)</p>
+
+<h1 id="activate-advanced-formula-environment">Activate Advanced Formula Environment</h1>
+<p>Insert the following in your advanced formula environment.</p>
+<pre><code class="language-typescript">
+DebtSchedule = LAMBDA( 
+    [OpenBalance], 
+    [CashBalance],
+    [CFArray],
+    [MandatoryAmort], 
+    [CashSweep],
+    [PIKRate], 
+    [CashRate], 
+    LET(
+         _Title, TOCOL({
+                    "Debt Opening",
+                    "Mandatory Amortisation",
+                    "Optional Amortisation", 
+                    "Cash Interest",
+                    "PIK Interest", 
+                    "Total Interest", 
+                    "Debt Closing",
+                    "Cash Opening", 
+                    "Cash Closing"
+                }),
+        _Process, 
+            REDUCE(
+                0, SEQUENCE( 1, COUNTA( CFArray )),
+                LAMBDA( 
+                    Accumulator, n , 
+                    LET(
+                        // Individual values of arrays
+                        _Opening,           IF( n=1, OpenBalance, INDEX( CHOOSECOLS( Accumulator, -1 ), 7)), 
+                        _CashOpening,       IF( n=1, CashBalance, INDEX( CHOOSECOLS( Accumulator, -1 ), 9)),
+                        _CFAvail,           INDEX( CFArray, n ),
+                        
+                        // Calculations
+                        _MandatoryAmort,    - MIN( MandatoryAmort, _Opening) ,
+                        _OptionalAmort,     - MIN( _Opening +_MandatoryAmort, _CashOpening + _CFAvail+_MandatoryAmort ) * CashSweep,
+                        _PIKInterest,       _Opening * PIKRate,  
+                        _Closing,           _Opening + _MandatoryAmort + _OptionalAmort + _PIKInterest,
+                        _AvgDebtBalance,     AVERAGE(_Closing, _Opening),
+                        
+                        _CashInterest,      _AvgDebtBalance * CashRate, 
+                        _TotalInterest,     _PIKInterest + _CashInterest, 
+                        _CashClosing,       _CashOpening + _CFAvail + _MandatoryAmort + _OptionalAmort -_CashInterest ,
+
+                        // Formatting the result
+                    
+                        _Stack,         VSTACK(
+                                            _Opening, 
+                                            _MandatoryAmort,
+                                            _OptionalAmort, 
+                                            _CashInterest, 
+                                            _PIKInterest,
+                                            _TotalInterest, 
+                                            _Closing,
+                                            
+                                            _CashOpening,
+                                            _CashClosing
+                                        ),
+                    // Result
+                        Result,         IF(
+                                            n = 1, 
+                                            _Stack, 
+                                            HStACK( 
+                                                Accumulator, 
+                                                _Stack
+                                            )
+                                        ),
+                        Result
+                    )
+                )
+    )   , 
+    HSTACK( _Title, _Process)
+))
+</code></pre>]]></content><author><name>Joseph Cai</name></author><category term="finance" /><category term="template" /><category term="return" /><category term="portfolio" /><category term="finance" /><category term="diversification" /><summary type="html"><![CDATA[How to use one single formula to hack Debt schedule with CashSweep]]></summary></entry><entry><title type="html">How to Practically Diversify Your Investment for Non-financial Analysts (Free Calculator Workbook)</title><link href="https://no-arbitrage.github.io/no-arbitrage-old//finance/2024/11/18/How-to-Diversify-your-investment.html" rel="alternate" type="text/html" title="How to Practically Diversify Your Investment for Non-financial Analysts (Free Calculator Workbook)" /><published>2024-11-18T00:00:00+00:00</published><updated>2024-11-18T00:00:00+00:00</updated><id>https://no-arbitrage.github.io/no-arbitrage-old//finance/2024/11/18/How-to-Diversify-your-investment</id><content type="html" xml:base="https://no-arbitrage.github.io/no-arbitrage-old//finance/2024/11/18/How-to-Diversify-your-investment.html"><![CDATA[<h2 id="why-should-you-read-this">Why Should You Read This?</h2>
+
+<p>If you’ve ever wondered whether your investment portfolio is working as hard as you are, this post is for you. By the end, you’ll know how to optimize your portfolio like a pro. Plus, you’ll get a nifty spreadsheet that does the heavy lifting for you. Simply plug in your own investment data, and voilà—instant insights into how to make your money work smarter.</p>
+
+<p>Before we start, if you are not confident with your statistical, mathematical and financial knowledge. Don’t fear. A lot of times, the terminologies sound sophisticated and somewhat intelligent, but really the underlying concept is pretty simple. You will have some experience with Excel, and if you can run (not write) some python code, it will make things easier as well.</p>
+
+<p><em>Important Notice</em>
+Content is for informational purposes only and not meant as a recommendation for investment decisions.</p>
+
+<p>Here are some results from my sample analysis.</p>
+
+<hr />
+
+<h2 id="download-the-file-and-follow-along">Download the File and Follow Along</h2>
+
+<p>Here’s your toolkit: a downloadable spreadsheet and some step-by-step instructions. Screenshots included to guide you through the process. It’s like having a financial coach on your screen, minus the judgmental glances.</p>
+
+<p>Attachment:<a href="https://no-arbitrage.github.io/no-arbitrage-old//assets/xlsx/Portfolio_diversification.xlsx">Portfolio_diversification.xlsx</a></p>
+
+<hr />
+
+<p><strong>To outline the post</strong></p>
+
+<p>Part 1: How to use the calculator</p>
+
+<p>Part 2: How to measure portfolio performance</p>
+
+<p>Part 3: How to optimise it</p>
+
+<h2 id="part-1-how-to-use-the-calculator">Part 1: How to use the calculator</h2>
+
+<p>I believe the following screenshot should explain how it works probably better than me.</p>
+
+<p><img src="/assets/images/screenshot/diversification-Screenshot-1.jpeg" alt="diversification-Screenshot-1" /></p>
+
+<p><img src="/assets/images/screenshot/diversification-Screenshot-2.jpeg" alt="diversification-Screenshot-2" /></p>
+
+<h3 id="step-0-list-your-assets">Step #0: List your assets.</h3>
+
+<p><strong>Choose Equity or equity like Asset to run this analysis.</strong></p>
+
+<p>You can run this on any assets in theory, such as ETF funds. Fixed income securities (such as corporate bond) should be proceeded with caution, because the price information you are going to collect may not reflect the true return, as part of the return may come from coupon. If the asset doesn’t pay coupon or the asset is a fund that will just re-invest the proceed from the underlying fixe income holdings, that’s fine, as long as the price information reflect the asset return.</p>
+
+<p>You can run this analysis with real estate property assets. you can populate the price index of your local market if there is such available.  For periods you don’t have data, you can just use the last period, assuming there is no change. This behaviour in theory underestimates the asset volatility. But in practice, it may not be a bad thing to evaluate asset less often. It is a bit hassle to do because you have to make sure the date column are matched.</p>
+
+<p><strong>Fixed Income Portfolio Optimisation</strong></p>
+
+<p>Fixed Income portfolio typically have their own optimisation framework, such as immunisation. That’s a pretty different objective from Mean-Variance Optimisation framework.</p>
+
+<h3 id="step-1-collect-adjusted-daily-price-data">Step #1: Collect adjusted daily price data</h3>
+
+<p>In order collect the adjusted price data, you will need to either manually download the data directly from Yahoo Finance or your custom sources. Alternatively, you can use the python scripts below. All you need to do is to replace the line 4</p>
+
+<p><code>tickers = ["^GSPC", "^NDX", "AAPL", "MSFT", "VT", "GLD", "TSLA"]</code></p>
+
+<p>in the square brackets, replace these tickers with your own and make sure each is wrapped in either double or single quotation. And then throw this code into runtime,</p>
+
+<p><img src="/assets/images/screenshot/diversification-Screenshot-3.jpeg" alt="diversification-Screenshot-3" /></p>
+
+<p>python code is here</p>
+
+<pre><code class="language-python">import yfinance as yf
+import pandas as pd
+import os
+tickers = ["^GSPC", "^NDX", "AAPL", "MSFT", "VT", "GLD", "TSLA"]
+download_path = '~/Downloads/'
+filename = 'yfinance-downloads.csv'
+start_date = "2020-01-01"
+end_date = "2023-11-14"
+# Dictionary to store data
+data = {}
+# Fetch historical data for each ticker
+for ticker in tickers:
+    stock_data = yf.download(ticker, start=start_date, end=end_date)
+ # Ensure we're using adjusted close prices
+    stock_data['Adjusted Price'] = stock_data['Adj Close']
+    data[ticker] = stock_data
+    print(f"Downloaded data for {ticker} with adjusted prices")
+adj_data = {}
+for key, value in data.items():
+    adj_data[key] = value['Adjusted Price']
+df = pd.DataFrame( adj_data ) 
+filepath = os.path.join( download_path,filename )
+df.to_csv(filepath)
+</code></pre>
+
+<h3 id="step-2-compute-daily-return">Step #2: Compute daily return</h3>
+
+<p><img src="/assets/images/screenshot/diversification-Screenshot-4.jpeg" alt="diversification-Screenshot-4" /></p>
+
+<p>It is worth to mention that when I downloaded the data into the csv file, the data somehow was formatted as text therefore causing problems in subsequent calculation, it may not happen to you. But to show you how I work around it. I save the data from the download csv directly to the worksheet ‘yfinance-downloads’, and I used power query to help me reformat the data.</p>
+
+<p>If you would like to use my method, you can copy past the csv data to replace the existing data in the ‘yfinance-downloads’ page, and then, go to Data tab and click Refresh All bottom under Queries and connection section.</p>
+
+<p>PowerQuery code is here ( in case you are interested).  I’ve wrote my own code to make this query dynamic, able to process your custom data, most likely with different table headings (asset tickers) from mine.</p>
+
+<pre><code class="language-jsx">
+let
+    Source = Excel.CurrentWorkbook(){[Name="Table2"]}[Content],
+    Splitbydelimiter = Table.SplitColumn(Source, "Date", Splitter.SplitTextByEachDelimiter({" "}, QuoteStyle.Csv, false), {"Date.1", "Date.2"}),
+    withDates = Table.RemoveColumns(Splitbydelimiter,{"Date.2"}),
+
+    withoutDates = Table.RemoveColumns(withDates,{"Date.1"}),
+    columnheader = Table.ColumnNames(withoutDates), 
+    transform = List.Transform( columnheader, each {_, type number} ),
+  
+    TypeChange = Table.TransformColumnTypes(withDates,transform),
+    TypeChange2 = Table.TransformColumnTypes(TypeChange,  {{"Date.1",type date}}) 
+in
+    TypeChange2
+
+</code></pre>
+
+<h3 id="step-3--using-solver-to-get-the-allocation">Step #3 : Using Solver to get the allocation.</h3>
+
+<p><img src="/assets/images/screenshot/diversification-Screenshot-6.jpeg" alt="diversification-Screenshot-6" /></p>
+
+<p>Please find instructions in Part 3.</p>
+
+<p>Part 2 can be more interesting to read for people with certain level of financial knowledge or people come from a mathematical, computer science or engineering background, it is perfectly okay if you want to skip these. It mainly explains the certain choices of approach in the worksheet, such one specific return calculation is used instead of another.</p>
+
+<h2 id="part-2-how-to-measure-portfolio-performance">Part 2: How to measure portfolio performance</h2>
+
+<p>Intuitively, we are looking for a system to describe the risks and return properties of a portfolio. One of such system is <strong>Mean Variance Analysis.</strong></p>
+
+<p>Here’s where the magic happens—optimizing your portfolio using some fancy math.</p>
+
+<h3 id="mean-variance-optimization">Mean-Variance Optimization</h3>
+
+<p>Applying this framework, we formalise the portfolio performances in the following three measures. We use</p>
+
+<ol>
+  <li>Expected return to describe returns</li>
+  <li>Portfolio Variance (or standard deviation) to describe risks</li>
+  <li>Shape Ratio to measure the risk/return trade-off efficiency. It measures how much return you generate for every unit of risk taken.</li>
+</ol>
+
+<p>That’s it. Job’s done! Simple right? Now because you asked, I am going to dive a little deeper, only for those there are interested.</p>
+
+<p>The standard mathematical formula is provided alongside the matrix algebra version, which is very elegant and efficient for its brevity.</p>
+<details>
+  <summary>See the math formulas</summary>
+<table id="140e3015-02ac-8048-b62f-c30271935caf" class="simple-table"><thead class="simple-table-header"><tr id="73b29191-db58-4473-8d9f-444e81234de6"><th id="B@iE" class="simple-table-header-color simple-table-header" style="width:120px">Portfolio Statistics</th><th id="BiA`" class="simple-table-header-color simple-table-header" style="width:310px">Standard Math</th><th id="}\Fk" class="simple-table-header-color simple-table-header" style="width:210px">Matrix Algebra</th><th id="Oya:" class="simple-table-header-color simple-table-header" style="width:206px">Additional Notes</th></tr></thead><tbody><tr id="0ee5bae5-7101-4eaa-871a-b22847fb75fa"><th id="B@iE" class="simple-table-header-color simple-table-header" style="width:120px">Expected Return </th><td id="BiA`" class="" style="width:310px"><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo stretchy="false">(</mo><msub><mi>R</mi><mi>p</mi></msub><mo stretchy="false">)</mo><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup><msub><mi>w</mi><mi>i</mi></msub><mi>E</mi><mo stretchy="false">(</mo><msub><mi>R</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">E(R_p) = \sum_{i=1}^n w_i E(R_i)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.104em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8043em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span><span>﻿</span></span><br /><br />where: <br />• Rp is the return on the portfolio,<br />• Ri is the return on asset <br /><em>i</em> and<br />• <br /><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">w_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span><span>﻿</span></span> is the weighting of component asset<br /><br />Example with two assets<br /><br /><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mtext>⁡</mtext><mo stretchy="false">(</mo><mi>R</mi><mi>p</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>w</mi><mi>A</mi></msub><mo stretchy="false">(</mo><msub><mi>R</mi><mi>A</mi></msub><mo stretchy="false">)</mo><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><msub><mi>w</mi><mi>A</mi></msub><mo stretchy="false">)</mo><mi>E</mi><mtext>⁡</mtext><mo stretchy="false">(</mo><msub><mi>R</mi><mi>B</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">E⁡(Rp)=w_A(R_A)+(1−w_A)E⁡(R_B)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mord">⁡</span><span class="mopen">(</span><span class="mord mathnormal">Rp</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mord">⁡</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span><span>﻿</span></span><br /><br /></td><td id="}\Fk" class="" style="width:210px"><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo stretchy="false">(</mo><msub><mi>R</mi><mi>p</mi></msub><mo stretchy="false">)</mo><mo>=</mo><msup><mi>w</mi><mi>T</mi></msup><mi>E</mi><mo stretchy="false">(</mo><mi>R</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">E(R_p) = w^T E(R)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0913em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="mclose">)</span></span></span></span></span><span>﻿</span></span><br /><br />where:<br /><br /><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi></mrow><annotation encoding="application/x-tex">w</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span></span></span></span></span><span>﻿</span></span> is the column vector of portfolio weights {w1, w2, w3…wn}<br />E(R) is the column vector of expected returns<br /></td><td id="Oya:" class="" style="width:206px">Return calculation typically is<br />In standard form<br /><br /><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo stretchy="false">(</mo><msub><mi>R</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><msub><mi>P</mi><mi>i</mi></msub><mo>−</mo><msub><mi>P</mi><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><msub><mi>P</mi><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow></msub></mfrac></mrow><annotation encoding="application/x-tex">E(R_i)=\frac{P_i - P_{i-1}}{P_{i-1}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.4169em;vertical-align:-0.4868em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9301em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.1389em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2025em;"><span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.4518em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.1389em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mbin mtight">−</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.1389em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2025em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4868em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><span>﻿</span></span><br /><br />However, log normal form is much more popular. <br /><br /><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo stretchy="false">(</mo><msub><mi>R</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo>=</mo><mi>l</mi><mi>n</mi><mo stretchy="false">(</mo><mfrac><msub><mi>P</mi><mi>i</mi></msub><msub><mi>P</mi><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow></msub></mfrac><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">E(R_i)=ln(\frac{P_{i}}{P_{i-1}})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.3752em;vertical-align:-0.4868em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">n</span><span class="mopen">(</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8884em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.1389em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2025em;"><span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.4101em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3281em;"><span style="top:-2.357em;margin-left:-0.1389em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4868em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span></span></span></span></span><span>﻿</span></span></td></tr><tr id="cd2376a8-7ec1-4a5d-bd68-a66703443165"><th id="B@iE" class="simple-table-header-color simple-table-header" style="width:120px">Portfolio Variance</th><td id="BiA`" class="" style="width:310px">in Covariance terms<br /><br /><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>σ</mi><mi>p</mi><mn>2</mn></msubsup><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup><msubsup><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup><msub><mi>w</mi><mi>i</mi></msub><msub><mi>w</mi><mi>j</mi></msub><mtext>Cov</mtext><mo stretchy="false">(</mo><msub><mi>R</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi>R</mi><mi>j</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\sigma_p^2 = \sum_{i=1}^n \sum_{j=1}^n w_i w_j \text{Cov}(R_i, R_j)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1972em;vertical-align:-0.3831em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.453em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3831em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2401em;vertical-align:-0.4358em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8043em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8043em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4358em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord text"><span class="mord">Cov</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0077em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span><span>﻿</span></span><br /><br />In correlation terms<br /><br /><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>σ</mi><mi>p</mi><mn>2</mn></msubsup><mo>=</mo><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup><msubsup><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></msubsup><msub><mi>w</mi><mi>i</mi></msub><msub><mi>w</mi><mi>j</mi></msub><msub><mi>ρ</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><msub><mi>σ</mi><mi>i</mi></msub><msub><mi>σ</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">\sigma_p^2 = \sum_{i=1}^n \sum_{j=1}^n w_i w_j \rho_{ij} \sigma_i \sigma_j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1972em;vertical-align:-0.3831em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.453em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3831em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2401em;vertical-align:-0.4358em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8043em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8043em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4358em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">ij</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span></span><span>﻿</span></span><br /><br />Example with two assets}<br /><br /><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>σ</mi><mi>p</mi><mn>2</mn></msubsup><mo>=</mo><msubsup><mi>w</mi><mi>A</mi><mn>2</mn></msubsup><mi>x</mi><msubsup><mi>σ</mi><mi>A</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>w</mi><mi>B</mi><mn>2</mn></msubsup><mi>x</mi><msubsup><mi>σ</mi><mi>B</mi><mn>2</mn></msubsup><mo>+</mo><mn>2</mn><msub><mi>w</mi><mi>A</mi></msub><msub><mi>w</mi><mi>B</mi></msub><msub><mi>σ</mi><mi>A</mi></msub><msub><mi>σ</mi><mi>B</mi></msub><msub><mi>ρ</mi><mrow><mi>A</mi><mi>B</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\sigma_p^2= w_A^2 x \sigma_A^2+w_B^2 x \sigma_B^2+2w_Aw_B\sigma_A\sigma_B\rho_{AB}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1972em;vertical-align:-0.3831em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.453em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3831em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0894em;vertical-align:-0.2753em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.4247em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2753em;"><span></span></span></span></span></span></span><span class="mord mathnormal">x</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.4247em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2753em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0894em;vertical-align:-0.2753em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.4247em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2753em;"><span></span></span></span></span></span></span><span class="mord mathnormal">x</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.4247em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2753em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">2</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">ρ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">A</span><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span><span>﻿</span></span></td><td id="}\Fk" class="" style="width:210px"><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>σ</mi><mi>p</mi><mn>2</mn></msubsup><mo>=</mo><msup><mi>w</mi><mi>T</mi></msup><mo>∑</mo><mi>w</mi></mrow><annotation encoding="application/x-tex">\sigma _p^2 = w^T \sum{ w}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1972em;vertical-align:-0.3831em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.453em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3831em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0913em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span></span></span></span></span></span><span>﻿</span></span><br /><br />Σ is the covariance matrix of asset returns.<br /></td><td id="Oya:" class="" style="width:206px"></td></tr><tr id="140e3015-02ac-8006-8701-dd1ef942fd72"><th id="B@iE" class="simple-table-header-color simple-table-header" style="width:120px">Sharpe Ratio</th><td id="BiA`" class="" style="width:310px"><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>h</mi><mi>a</mi><mi>r</mi><mi>p</mi><mi>e</mi><mo>=</mo><mfrac><mrow><mi>E</mi><mo stretchy="false">(</mo><msub><mi>R</mi><mi>p</mi></msub><mo stretchy="false">)</mo><mo>−</mo><msub><mi>R</mi><mi>f</mi></msub></mrow><msub><mi>σ</mi><mi>p</mi></msub></mfrac></mrow><annotation encoding="application/x-tex">Sharpe = \frac{E(R_p) - R_f}{\sigma_p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mord mathnormal">ha</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">p</span><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.5804em;vertical-align:-0.5423em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0381em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1645em;"><span style="top:-2.357em;margin-left:-0.0359em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2819em;"><span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.5131em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05764em;">E</span><span class="mopen mtight">(</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1645em;"><span style="top:-2.357em;margin-left:-0.0077em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2819em;"><span></span></span></span></span></span></span><span class="mclose mtight">)</span><span class="mbin mtight">−</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.0077em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight" style="margin-right:0.10764em;">f</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2901em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.5423em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><span>﻿</span></span></td><td id="}\Fk" class="" style="width:210px"><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>h</mi><mi>a</mi><mi>r</mi><mi>p</mi><mi>e</mi><mo>=</mo><mfrac><mrow><msup><mi mathvariant="bold">w</mi><mi mathvariant="normal">⊤</mi></msup><mo stretchy="false">(</mo><mi mathvariant="bold">E</mi><mo stretchy="false">(</mo><mi>R</mi><mo stretchy="false">)</mo><mo>−</mo><msub><mi>R</mi><mi>f</mi></msub><mn mathvariant="bold">1</mn><mo stretchy="false">)</mo></mrow><msqrt><mrow><msup><mi mathvariant="bold">w</mi><mi mathvariant="normal">⊤</mi></msup><mi mathvariant="normal">Σ</mi><mi mathvariant="bold">w</mi></mrow></msqrt></mfrac></mrow><annotation encoding="application/x-tex">Sharpe = \frac{\mathbf{w}^\top (\mathbf{E}(R) - R_f \mathbf{1})}{\sqrt{\mathbf{w}^\top \Sigma \mathbf{w}}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mord mathnormal">ha</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">p</span><span class="mord mathnormal">e</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.7em;vertical-align:-0.538em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.162em;"><span style="top:-2.5029em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord sqrt mtight"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9816em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mtight" style="padding-left:0.833em;"><span class="mord mtight"><span class="mord mathbf mtight" style="margin-right:0.01597em;">w</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.782em;"><span style="top:-2.786em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mord mtight">Σ</span><span class="mord mathbf mtight" style="margin-right:0.01597em;">w</span></span></span><span style="top:-2.9416em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail mtight" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
+c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
+c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
+s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
+c69,-144,104.5,-217.7,106.5,-221
+l0 -0
+c5.3,-9.3,12,-14,20,-14
+H400000v40H845.2724
+s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
+c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
+M834 80h400000v40h-400000z" /></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.0584em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.5131em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathbf mtight" style="margin-right:0.01597em;">w</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.927em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">⊤</span></span></span></span></span></span></span></span><span class="mopen mtight">(</span><span class="mord mathbf mtight">E</span><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.00773em;">R</span><span class="mclose mtight">)</span><span class="mbin mtight">−</span><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.00773em;">R</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.0077em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight" style="margin-right:0.10764em;">f</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2901em;"><span></span></span></span></span></span></span><span class="mord mathbf mtight">1</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.538em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><span>﻿</span></span></td><td id="Oya:" class="" style="width:206px"></td></tr></tbody></table>
+
+</details>
+
+<h3 id="discussion-1-why-use-log-return-instead-of-standard-return-formula">Discussion #1: Why use Log return instead of standard return formula?</h3>
+
+<ul>
+  <li>Additive . the mathematically property of log provides us the ability to link period return by summing them instead of using geographic linking.</li>
+  <li>Asset return is not normally distributed. It typically has a fat left tail and think right tail  in real world</li>
+  <li>This form is also widely used in derivative market where interest rate compounding period is assumed to be infinite. and you have $ P_0 \cdot e^{E(R)T} = P_1 $</li>
+</ul>
+
+<h3 id="discussion-2--daily-adjusted-closing-price">Discussion #2:  Daily Adjusted Closing Price</h3>
+
+<p>We used Daily Adjusted Closing Price to calculate returns. Adjustments are carried out to account for stock split, dividends and new issuance.</p>
+
+<p>Do you need to adjust for inflation? Not necessary. As long as all your prices are consistent and results will also remain consistent.</p>
+
+<p>Do we need to adjust for FX if I have a multi-currency portfolio? Not necessary. This topic is worth a few posts to explain. For simplicity, because the returns are in percentage turns, as long as the weighting is applied after converting asset values into a common currency, the results will be valid.</p>
+
+<h3 id="discussion-3-over-what-period-should-i-run-analysis-for--horizon">Discussion #3: Over what period should I run analysis for  (Horizon)</h3>
+
+<p>In common sense, the backward-looking historical period should be in line with your forward-looking investment horizon. Statistically, a full business cycle period is likely provide more informative and less biased prediction.</p>
+
+<p>In our file, a roughly four-year period is used. In order to better predict future returns, select a period that is <a href="https://en.wikipedia.org/wiki/Stationary_process">stationary</a>, ideally cover a business cycle, despite not being essential.</p>
+
+<p>This data is provided by Yahoo Finance (through yfinance python module, source code already provided in the file).</p>
+
+<h3 id="discussion-4-portfolio-variance">Discussion #4: Portfolio Variance</h3>
+
+<p>This measure captures the variation of returns.  This measure has many flaws.</p>
+
+<ul>
+  <li>First, Two portfolios with very different return distributions can have similar variances.  Only if the return distribution is Normal, then, you can define a unique distribution with Mean and Variance. It is widely observed that asset returns are not perfectly normal.</li>
+  <li>Second, only downward variations in price are considered risks by investors, positive variations in price are not perceived as risks. VaR (<a href="https://en.wikipedia.org/wiki/Value_at_risk">Value at Risk</a>) capture only the downside variations therefore can potentially serve as a better alternative. (VaR falls out of the scope of this post.)</li>
+</ul>
+
+<h3 id="discussion-5-covariance-matrix">Discussion #5: Covariance Matrix</h3>
+
+<p>Example of Covariance Matrix</p>
+
+<p><br />
+\Sigma =
+\begin{bmatrix}
+\sigma_{1}^2 &amp; \sigma_{12} &amp; \sigma_{13} <br />
+\sigma_{12} &amp; \sigma_{2}^2 &amp; \sigma_{23} <br />
+\sigma_{13} &amp; \sigma_{23} &amp; \sigma_{3}^2
+\end{bmatrix}
+\</p>
+
+<p>Variance is defined as $V(x)=\frac{1}{N-1}\Sigma(x_i-μ)^2$
+Covariance between two random variables x and y (or columns of a matrix) is defined as $Cov(x,y)= \frac{1}{N-1} \Sigma (x_i−μ_x)(y_i−μ_y) $  and $Cov(x,x)=V(x)$</p>
+
+<p>The term covariance matrix may be misleading to you. It is not any sort of a special matrix. It is simply set of variances and covariances between pairs of columns. A position of any element in the covariance matrix corresponds to variance/covariance between a pair of two columns, e.g. a number located in 3rd row and 2nd column in the covariance matrix represents covariance between 3rd and 2nd columns of matrix A. $Cov(x,y)=Cov(y,x)$ , therefore covariance matrix is symmetric.</p>
+
+<ul>
+  <li>For N asset portfolio, you will have N x N covariance matrix.</li>
+  <li>Any <a href="https://en.wikipedia.org/wiki/Covariance">covariance</a> matrix is <a href="https://en.wikipedia.org/wiki/Symmetric_matrix">symmetric</a> and <a href="https://en.wikipedia.org/wiki/Positive_semi-definite_matrix">positive semi-definite</a> and its main diagonal contains <a href="https://en.wikipedia.org/wiki/Variance">variances</a>.</li>
+  <li>Covariance matrix can only be calculated through actual underlying price data. Practically, the most used two ways to generate covariance matrix in Excel are
+    <ul>
+      <li>use Data Analysis Toolpak (Add-In) to calculate the covariance.</li>
+      <li>use Excel scripting formula</li>
+    </ul>
+
+    <p>In the template file, I used the Excel scripting formula to calculate the covariance matrix. This allows dynamic evaluation (Analysis Toolpak require manual re-do the analysis when you change data)  and  it also avoids Add-in compatibility issues.</p>
+  </li>
+  <li>This is the fundamental piece of portfolio theory. the covariance matrix captures the potential of diversification among component assets.</li>
+  <li>Diversification is arguably the only free lunch in the financial world.</li>
+</ul>
+
+<h3 id="discussion-6-weighting">Discussion #6: Weighting</h3>
+
+<p>We assume you won’t go full “Wolf of Wall Street” by short-selling. All weights in your portfolio will stay positive. Plus, you’ll invest fully—because letting money sit idle is like letting a treadmill gather dust.</p>
+
+<p>In our template file, we specify that each asset must take at least 5% of the portfolio value. This constraints avoids the situation of short selling. And if one can borrow at risk free rate, the portfolio return/return can be further optimised to investor’s advantage. Under that condition, we can even constructing a market portfolio and customised a risk / return profile to investor’s preference. In the future, I will dedicate a post for this topic.</p>
+
+<h3 id="discussion-7-sharp-ratio">Discussion #7: Sharp Ratio</h3>
+
+<p>The Sharpe Ratio is like a quick fitness test for your portfolio: How much return are you getting for every unit of risk? Are you taking risks efficiently?</p>
+
+<p>The Efficient Frontier is where your portfolio hits the sweet spot—maximizing returns for a given level of risk.</p>
+
+<p>Sharp ratio provides a universal, straightforward and useful concept to compare investment performance based on mean and variance.  We subtract a risk-free rate from the portfolio return to separate the riskless and risky portion of returns. Then we compare the return premium to the added risk.</p>
+
+<p>We will discuss efficient frontier in a separate post.</p>
+
+<blockquote>
+  <p>Markowitz demonstrated that diversification reduces risk so that investors can earn the same return with lower risk, or a higher return for the same risk. <strong>He argued that “diversification is the only free lunch in finance.”</strong> Investors were urged to diversify across stocks, countries and asset classes.</p>
+
+</blockquote>
+
+<blockquote>
+  <p><strong>Teamwork Makes the Dream Work</strong>
+<em>Think of this as figuring out which assets in your portfolio get along and which are the drama queens. Assets with low or negative covariance balance each other out, reducing your overall risk. If many of assets share similar temper, may god bless you.</em></p>
+
+</blockquote>
+
+<h3 id="section-summary">Section Summary</h3>
+
+<p>So based on what we discussed above, the next step should be intuitive, we want to maximise the return and minimise the risks based on the portfolio.</p>
+
+<p>Next, we can leverage the Excel Solver tool to do the leg work and compute an optimal results.</p>
+
+<ul>
+  <li>
+    <p>We are standing on Giants shoulder</p>
+
+    <p>Economist <a href="https://en.wikipedia.org/wiki/Harry_Markowitz">Harry Markowitz</a> introduced MPT in a 1952 <a href="https://en.wikipedia.org/wiki/Modern_portfolio_theory#cite_note-markowitz1952-1">essay</a> for which he was later awarded a <a href="https://en.wikipedia.org/wiki/Nobel_Memorial_Prize_in_Economic_Sciences">Nobel Memorial Prize in Economic Sciences</a> (<a href="https://en.wikipedia.org/wiki/Markowitz_model">Markowitz model</a>).</p>
+
+    <p>This Mean Variance Optimisation framework is a big thing in Finance and is often mixed with a more significant term, [<strong>Modern portfolio theory](https://en.wikipedia.org/wiki/Modern_portfolio_theory). (like all significant and difficult-to-understand things in our life,  it has an acronym, MPT).</strong></p>
+  </li>
+</ul>
+
+<h2 id="part-3-solving-the-optimisation-problem">Part 3: Solving the Optimisation Problem</h2>
+
+<p>This is very simple,</p>
+
+<p><em>1. Switching on Solver feature in Excel if it is not on yet.</em></p>
+
+<p><img src="/assets/images/screenshot/solver-screenshot-1.jpeg" alt="image.png" /></p>
+
+<p><em>2. Once enabled, you can find them here</em></p>
+
+<p><img src="/assets/images/screenshot/solver-screenshot-2.jpeg" alt="image.png" /></p>
+
+<p>Then, go straight to the point!</p>
+
+<p><em>3. Configurations Guide</em></p>
+
+<p><img src="/assets/images/screenshot/solver-screenshot-3.jpeg" alt="image.png" /></p>
+
+<ul>
+  <li>Objective: Set this to be the shape ratio, set max as a goal.</li>
+  <li>Changing variables: Select the portfolio weighting array</li>
+  <li>Constraints: based on traditional insights to have set some guideline limits for each portfolio asset, for example, no asset should have a weight that’s 10x time than the smallest asset in the portfolio.</li>
+  <li>Solving method</li>
+</ul>
+
+<p><a href="https://no-arbitrage.com/operational-reasearch/2024/11/17/comparing-solvers-in-excel">Comparing Simplex, GRG Non-Linear and Evolution method in Excel Solver.</a></p>
+
+<h2 id="closing-note">Closing Note</h2>
+
+<p>This post is meant to be a practical one. A lot of ideas came up while editing this post. I will dedicate posts for some of the topics below</p>
+<ul>
+  <li>Fixed Income portfolio optimisation.</li>
+  <li>Market Portfolio</li>
+  <li>From Portfolio Theory to CAPM Model and M-M theory</li>
+  <li>Optimisation - Basic Operational Research</li>
+</ul>]]></content><author><name>Joseph Cai</name></author><category term="finance" /><category term="template" /><category term="return" /><category term="portfolio" /><category term="finance" /><category term="diversification" /><summary type="html"><![CDATA[Why Should You Read This?]]></summary></entry><entry><title type="html">Comparing Default Solvers in Excel</title><link href="https://no-arbitrage.github.io/no-arbitrage-old//operational-reasearch/2024/11/17/Comparing-solvers-in-excel.html" rel="alternate" type="text/html" title="Comparing Default Solvers in Excel" /><published>2024-11-17T00:00:00+00:00</published><updated>2024-11-17T00:00:00+00:00</updated><id>https://no-arbitrage.github.io/no-arbitrage-old//operational-reasearch/2024/11/17/Comparing-solvers-in-excel</id><content type="html" xml:base="https://no-arbitrage.github.io/no-arbitrage-old//operational-reasearch/2024/11/17/Comparing-solvers-in-excel.html"><![CDATA[<p><img src="/assets/images/solver.png" alt="banner" /></p>
+
+<h2 id="simplex-method"><strong>Simplex Method</strong></h2>
+
+<ul>
+  <li>Used for linear optimization problems</li>
+  <li>Fastest and most reliable for linear models</li>
+  <li>Guaranteed to find the global optimum for linear problems</li>
+  <li>Only works when the Assume Linear Model box is checked<a href="https://www.solver.com/standard-excel-solver-limitations-nonlinear-optimization">1</a></li>
+</ul>
+
+<h2 id="grg-generalizedreduced-gradient-nonlinear-method"><strong>GRG (Generalized Reduced Gradient) Nonlinear Method</strong></h2>
+
+<ul>
+  <li>Used for nonlinear optimization problems</li>
+  <li>Can handle smooth, continuous nonlinear functions</li>
+  <li>May find local optima rather than global optima</li>
+  <li>Slower than Simplex but faster than Evolutionary</li>
+  <li>Default method when Assume Linear Model is unchecked<a href="https://www.solver.com/standard-excel-solver-limitations-nonlinear-optimization">1</a></li>
+  <li>Works well for problems with continuous derivatives</li>
+</ul>
+
+<h2 id="evolutionary-method"><strong>Evolutionary Method</strong></h2>
+
+<ul>
+  <li>Used for non-smooth or discontinuous problems</li>
+  <li>Can handle discrete variables and non-smooth functions</li>
+  <li>Slowest of the three methods</li>
+  <li>May not find the global optimum, but can often find good solutions for complex problems</li>
+  <li>Useful when other methods fail due to discontinuities or discrete variables</li>
+</ul>
+
+<h2 id="key-considerations"><strong>Key Considerations</strong></h2>
+
+<ul>
+  <li><strong>Problem Type</strong>: Linear problems should use Simplex. Nonlinear but smooth problems can use GRG Nonlinear. Complex or discontinuous problems may require Evolutionary.</li>
+  <li><strong>Solution Quality</strong>: Simplex guarantees global optima for linear problems. GRG may find local optima. Evolutionary is less precise but can handle more complex problems.</li>
+  <li><strong>Computation Time</strong>: Simplex is fastest, followed by GRG, with Evolutionary typically being the slowest.</li>
+  <li><strong>Starting Points</strong>: GRG and Evolutionary methods can benefit from multiple starting points to increase the chance of finding the global optimum<a href="https://www.solver.com/standard-excel-solver-limitations-nonlinear-optimization">1</a>.</li>
+  <li><strong>Constraints</strong>: All methods can handle constraints, but their effectiveness may vary depending on the problem structure.</li>
+</ul>
+
+<p>To get the best results, it’s often recommended to:</p>
+
+<ol>
+  <li>Use Simplex for linear problems</li>
+  <li>Try GRG Nonlinear first for smooth nonlinear problems</li>
+  <li>Use Evolutionary as a last resort for complex, discontinuous problems</li>
+  <li>Experiment with different starting points, especially for GRG Nonlinear<a href="https://www.solver.com/standard-excel-solver-limitations-nonlinear-optimization">1</a></li>
+  <li>Consider using the MultiStart option with GRG Nonlinear for global optimization<a href="https://www.solver.com/excel-solver-change-options-grg-nonlinear-solving-method">2</a></li>
+</ol>
+
+<p>By understanding the strengths and limitations of each method, you can choose the most appropriate solver for your specific optimization problem in Excel.</p>
+
+<h3 id="additional-learning-resource-to-check-out">Additional Learning Resource to check out</h3>
+
+<p>Some Solver resources
+<a href="https://www.solver.com/solver-tutorial-using-solver">Frontier Solver</a> 
+They have a lot of template files with case studies to help learning</p>
+
+<p><a href="https://support.microsoft.com/en-gb/office/load-the-solver-add-in-in-excel-612926fc-d53b-46b4-872c-e24772f078ca">Microsoft Offical Documentation</a></p>
+
+<p><a href="https://support.microsoft.com/en-gb/office/define-and-solve-a-problem-by-using-solver-5d1a388f-079d-43ac-a7eb-f63e45925040">Microsoft Offical Tutorial</a></p>
+
+<p><a href="https://opensolver.org/">Open Solver</a>
+Alternative solver solution with advanced models.</p>]]></content><author><name>Joseph Cai</name></author><category term="operational-reasearch" /><category term="book" /><category term="return" /><category term="fixed-income" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">Calculating Returns</title><link href="https://no-arbitrage.github.io/no-arbitrage-old//finance/2024/11/04/about-return-concept.html" rel="alternate" type="text/html" title="Calculating Returns" /><published>2024-11-04T00:00:00+00:00</published><updated>2024-11-04T00:00:00+00:00</updated><id>https://no-arbitrage.github.io/no-arbitrage-old//finance/2024/11/04/about-return-concept</id><content type="html" xml:base="https://no-arbitrage.github.io/no-arbitrage-old//finance/2024/11/04/about-return-concept.html"><![CDATA[<p><img src="/assets/images/posts/kenny-eliason-maJDOJSmMoo-unsplash.jpg" alt="banner" /></p>
+
+<p>Images: kenny-eliason (unsplash.com)</p>
+
+<h1 id="motivation">Motivation</h1>
+
+<p>This post is mainly about a few return concepts common in Fixed Income.  This post is driven by a LinkedIn post that I saw the other day, people are debating about return, yield and bond prices. I think it maybe an interesting topic to discuss in my blog. The target audience could be</p>
+
+<ul>
+  <li>analyst, junior or senior, feeling necessarily to calibrate or refresh this knowledge.</li>
+  <li>general public who are interested in knowing what does their bank mean by APR for their credit card.</li>
+</ul>
+
+<p>I hope you enjoy this post.</p>
+
+<h1 id="measuring-return">Measuring Return</h1>
+
+<h2 id="holding-period-return--hpr">Holding Period Return  (HPR)</h2>
+
+<h3 id="zero-coupon-bonds-held-to-maturity">Zero coupon bonds, held to maturity</h3>
+
+<p>There is a fixed income (bond) product, If we paid X today, and we will receive 100 by end of the period (6 months), when the bond matures, Then we say.</p>
+
+<ul>
+  <li>The holding period of the bond is P (6 Months)</li>
+  <li>The holding period return is <strong>(100 - X) / X</strong></li>
+  <li>The Yield-to-maturity is <strong>(100 - X) / X</strong></li>
+</ul>
+
+<p>Right, if the holding period is now 18 months, the formula doesn’t change, because in holding period return, as long as the bond doesn’t pay interests during the term, you can ignore the compounding behaviour.</p>
+
+<h3 id="interest-bearing-bonds-held-to-maturity">Interest bearing bonds, held to maturity</h3>
+
+<p>There is a bond, The face value of the bond is 100, the maturity of the bond is 12 months. there will be interest payment every 6 months. the coupon rate is 4%. the bond is trading at 101. what is the holding period return if we hold the bond to its maturity.</p>
+
+<p>In this case, you need to add the income (interest payment) into your calculation. the formula is</p>
+
+<p>Holding Period Return = ( Price change + Income ) / Initial Price</p>
+
+<ul>
+  <li>The price change in this case is 101 - 100 = 1.</li>
+  <li>The income is twice 4%/2 X 100. that is still 4. (because every time it pays 2, and in a year, it pays 4 in total)</li>
+  <li>The holding period return is 5/101 = 4.95%</li>
+</ul>
+
+<p>With the formula above, if not held to maturity, whatever price the bond is sold off will determine the ending price and how many times interests payment you will collect will determine the income. and then you can calculate the Holding Period Return competently.</p>
+
+<p>So how does the market interest rate come into our play? Well, the price you are paying today for the bond is 1 above the face value 100 for 12 months, that means the market interest rate must be slightly lower than 4%. because of that, in order to get 4% return, intuitively, you will have to pay slightly higher than 100 to make that even. The same intuition can be applied if you are selling this bond before its maturity.</p>
+
+<p>However, by its maturity, the bond price will converge to its face value. Because selling this bond to any other party at maturity, it will always be just at its face value, because whoever hold the bond will receive original issuers payment of its face value (if there is no default of course).</p>
+
+<p>You might hear people use the term duration. for zero coupon bond the duration = its maturity.  for interest bearing, if people use it interchangeably, correct them. The duration will be shorter than its maturity.</p>
+
+<h2 id="effective-annual-rate-ear-or-cagr">Effective Annual Rate (EAR or CAGR)</h2>
+
+<p>Effective Annual Rate is the most frequent used return concept in investment world. When people mention CAGR, it also refers to this concept.  .The concept is defined as  <strong>percentage increase in funds per year.</strong></p>
+
+<h3 id="concept-about-compounding">Concept about compounding</h3>
+
+<p>When the product is within one year (we call this money market),  the convention is to not calculate the compounding effects, therefore not to use the Effective Annual Return, instead we use a new concept Annual Percentage return, which will come shortly. For now, just assume the compounding effect also exit for products within one year.</p>
+
+<p>A 12 month coupon bond calculates coupon every six month, however it doesn’t pay until maturity, that means it will roll the first interest payment in to the sum and use that to calculate my second interest income.</p>
+
+<p>Principle * ( 1 + (5%/2)) ^ 2</p>
+
+<p>But if the product is 10 years long, no coupon payment before maturity, it explicitly says interest compound every six month ( despite in reality no such strange product exists), then your return is</p>
+
+<p>Principle * ( 1 + 5% / 2) ^ ( 10 * 2)</p>
+
+<p>But if the product is 10 years long, no coupon payment before maturity, it explicitly says interest compound every three month, then your return is</p>
+
+<p>Principle * ( 1 + 5% / 4) ^ ( 10 * 4)</p>
+
+<p>f the product is 10 years long, no coupon payment before maturity, it explicitly says interest compounding is calculated continously, then your return is</p>
+
+<p>Principle *  e ^ (5% * 10)</p>
+
+<h3 id="zero-coupon-bond-held-to-maturity">Zero coupon bond, held to maturity</h3>
+
+<p>There is a zero coupon bond with a 10 years maturity (or duration). the face value is 100, the bond is currently trading at 75. what is the Effective Annual Rate?</p>
+
+<ul>
+  <li>The formula is EAR = ( end price / initial price ) ^ ( 1/N ) -1</li>
+  <li>This is how you would calculate CAGR, Compounding Annual Growth Rate</li>
+  <li>to understand this formula, the easiest way is that you read it backwards, assuming you already know the EAR is r, and you also know the current price is 75, you can calculate the future value = 75 * (1 + r) ^ (N). now you reverse the calculation by the math principle.</li>
+</ul>
+
+<p>We don’t talk about the case for interest bearing bonds in Effective Annual Rate, because once you have intermediary cash flow, it becomes a different concept IRR. internal rate of return.</p>
+
+<h2 id="annual-percentage-rate-apr">Annual Percentage Rate (APR)</h2>
+
+<p>Effective annual rates explicitly account for compound interest. In contrast, rates on short
+term investments (by convention, with holding periods less than a year), are in practice
+often annualized using simple interest that ignores compounding. These are called annual
+percentage rates, or APRs. There is a formula to convert between the two.</p>
+
+<p>1 + EAR = ( 1 + APR / n) ^ n</p>
+
+<p>A <strong>credit card’s APR</strong> (annual percentage rate) is the total cost of its interest rate (e.g. 20%) plus the <strong>fees</strong> every cardholder pays as standard, such as the annual <strong>fee</strong> – it’s the cost of borrowing money over a year. All other <strong>fees</strong> and charges, such as for missed repayments and cash withdrawals are excluded from the <strong>APR</strong>.</p>
+
+<p>To make it simple, let’s assume you don’t pay the card fee. Suppose you must pay 1.5% interest per month on your outstanding credit card balance. The APR would be reported as 1.5% × 12 = 18%, but the effective annual rate is higher, 19.56%, because 1.015^12 − 1 = 0.1956. Until you pay off your outstanding balance, it will increase each month by the multiple 1.015, so after 12 months, the balance will increase by 1.01512. This is why we call the EAR an effective rate. However the banks are only required to market APR.</p>
+
+<h1 id="closing-thoughts">Closing thoughts</h1>
+
+<p>Return calculation is one of the basic building block of skillsets for people who choose finance as their major or career. It is confusing at first, but after a few repetitions, it will become clearer.</p>
+
+<p>If you are serious about the topic, I recommend you follow the first five chapters of the book</p>
+
+<p>Investments by Zvi Bodie, Alex Kane, Alan Marcus, published by McGraw Hill.</p>
+
+<p>Amazon Link <a href="https://www.amazon.co.uk/Investments-Zvi-Bodie/dp/0077861671">Investments: Amazon.co.uk: Bodie, Zvi, Kane, Alex, Marcus, Alan: 9780077861674: Books</a></p>
+
+<p>Google Link <a href="https://books.google.co.uk/books/about/EBOOK_Investments_Global_edition.html?id=BMsvEAAAQBAJ&amp;redir_esc=y">EBOOK: Investments - Global edition - Zvi Bodie, Alex Kane, Alan Marcus - Google Books</a></p>
+
+<p>This is one of the top finance books available. The later chapters of this book dives into many advanced topics in finance such as Modern Portfolio Theory and Equilibrium models in the market, Efficiency Market Hypotheses, these contents are recognised with Nobel Prizes. The book covers equity, fixed income and derivatives, depending on which version you are reading. In my own academic journey pursuing Finance, I’ve spent countless days and nights chewing over some of the chapters in this book again and again. Now looking back, it still such a great book that definitely is worthy of spending time with.</p>]]></content><author><name>Joseph Cai</name></author><category term="finance" /><category term="book" /><category term="return" /><category term="fixed-income" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">Implementing Basket Analysis in Power BI and SQL - Association rule</title><link href="https://no-arbitrage.github.io/no-arbitrage-old//data/2024/11/04/basket-analysis-for-data-analyst.html" rel="alternate" type="text/html" title="Implementing Basket Analysis in Power BI and SQL - Association rule" /><published>2024-11-04T00:00:00+00:00</published><updated>2024-11-04T00:00:00+00:00</updated><id>https://no-arbitrage.github.io/no-arbitrage-old//data/2024/11/04/basket-analysis-for-data-analyst</id><content type="html" xml:base="https://no-arbitrage.github.io/no-arbitrage-old//data/2024/11/04/basket-analysis-for-data-analyst.html"><![CDATA[<p><img src="/assets/images/posts/heidi-fin-2TLREZi7BUg-unsplash.jpg" alt="banner" /></p>
+
+<p>Images: Heidi Fin (unsplash.com)</p>
+
+<h1 id="power-bi-dax-implementation">Power BI (DAX) Implementation</h1>
+
+<h2 id="goal">Goal</h2>
+
+<p>This post is share my experience of implementing basket analysis in Power BI and sql. At the end of this post, I will attach links for my Power BI file. Please note this power BI is receiving updates as I write new posts.</p>
+
+<p>You can find the Power BI file here, some screeshots are provided in this post</p>
+
+<p>Attachment: <a href="https://no-arbitrage.github.io/no-arbitrage-old//assets/pbix/241103_AdventureWorks_na.pbix">241103_AdventureWorks_na.pbix</a></p>
+
+<h2 id="key-idea">Key Idea</h2>
+
+<p>Basket analysis using Association Rule, involves understanding purchase patterns over time to see how products relate to each other within a customer’s buying journey. In this approach, each customer is viewed as a “basket,” meaning we analyze product relationships based on all items they’ve bought, across different orders. The purpose is to find patterns in what customers purchase together, over time, rather than in a single transaction.</p>
+
+<p>Key metrics, like <em>support</em>, <em>confidence</em>, and <em>lift</em>, are used to understand these product relationships:</p>
+
+<ul>
+  <li><strong>Support</strong>: The percentage of total customers who bought both items. It gives a sense of the prevalence of a combination in the overall population.</li>
+  <li><strong>Confidence</strong>: The likelihood that a customer who bought one product also bought another.</li>
+  <li><strong>Lift</strong>: The strength of the association between two products. A lift greater than 1 implies a meaningful association that could predict future purchases.</li>
+</ul>
+
+<p>For example, if “Computers” and “Cell phones” frequently appear in a customer’s purchase history, the analysis could reveal that customers who buy “Cell phones” have a high likelihood of also purchasing “Computers,” helping companies understand customer preferences and potentially guiding personalized marketing strategies.</p>
+
+<h3 id="step-1-cartesian--product-of-product-with-itself">Step 1: Cartesian  product of Product with itself</h3>
+
+<p>Create a Cartesian  product of Product with itself(And Product) on a calculated table and calculate the common customers of each combination</p>
+
+<pre><code class="language-jsx">DEFINE MEASURE [# Customers Both (Internal)] = 
+
+ VAR CustomersWithAndProducts =
+    CALCULATETABLE (
+        DISTINCT ( Sales[CustomerKey] ),
+        REMOVEFILTERS ( 'Product' ),
+        REMOVEFILTERS ( Sales[ProductKey] ),
+        USERELATIONSHIP ( Sales[ProductKey], 'And Product'[And ProductKey] )
+    )
+VAR Result =
+    CALCULATE ( [# Customers], KEEPFILTERS ( CustomersWithAndProducts ) )
+RETURN
+    Result
+------------------------------------------
+EVALUATE
+RawProductsCustomers = 
+FILTER (
+    SUMMARIZECOLUMNS (
+        'Sales'[ProductKey],
+        'And Product'[And ProductKey],
+        "Customers", [# Customers Both (Internal)]
+    ),
+    NOT ISBLANK ( [Customers] ) &amp;&amp; 'And Product'[And ProductKey] &lt;&gt; 'Sales'[ProductKey]
+)
+</code></pre>
+
+<h3 id="step-2-customer-support">Step 2: Customer Support.</h3>
+
+<p>Customer Support has a difficult name, but the idea is “what’s ratio of number of common customers of each combination and total number of customers.”</p>
+
+<pre><code class="language-jsx">DEFINE MEASURE [# Customers Both] = 
+VAR ExistingAndProductKey =
+    CALCULATETABLE (
+        DISTINCT ( RawProductsCustomers[And ProductKey] ),
+        TREATAS (
+            DISTINCT ( 'And Product'[And ProductKey] ),
+            RawProductsCustomers[And ProductKey]
+        )
+    )
+VAR FilterAndProducts =
+    TREATAS (
+        EXCEPT (
+            ExistingAndProductKey,
+            DISTINCT ( 'Product'[ProductKey] )
+        ),
+        Sales[ProductKey]
+    )
+VAR CustomersWithAndProducts =
+    CALCULATETABLE (
+        SUMMARIZE ( Sales, Sales[CustomerKey] ),
+        REMOVEFILTERS ( 'Product' ),
+        FilterAndProducts
+    )
+VAR Result =
+    CALCULATE (
+        [# Customers],
+        KEEPFILTERS ( CustomersWithAndProducts )
+    )
+RETURN
+    Result
+----------------------------------------------------
+DEFINE MEASURE [# Customers Total] **=** 
+CALCULATE ( 
+    ****[# Customers], 
+    ****REMOVEFILTERS ( 'Product' ) 
+**)**
+    
+----------------------------------------------------    
+DEFINE MEASURE [% Customers Support] = 
+DIVIDE ( [# Customers Both], [# Customers Total] )
+    
+
+</code></pre>
+
+<p>Wait, why this common customer is so mess here. Let’s dive into the measure. The core logic here is to first, get the number of customers in the first list of Products, which is a standard measure [# Basket]. Then, you want to use a list of customers for And Product  as a filter to filter this measure. This is called Table Filter technique in DAX, relatively advanced concept in DAX.</p>
+
+<p>Then the question becomes How to do you get this list of customers for And Product? You first use TREATAS to connect the sales table and And Product table,, once they are connected, you can summarize this sales table (with data lineage) by customers. This technique is called Data Lineage. is a basic concept, however easy to trip over even for advanced DAX users.</p>
+
+<h3 id="step-3-customer-lift">Step 3: Customer Lift.</h3>
+
+<p>Customer Lift is nothing complex but a comparison of two ratios. Don’t get fooled by its sophisticated name. This measure is comparing the first ratio we calculated above to a second ratio, “What is the ratio of customers for <strong>And Product</strong> to total number of customers.</p>
+
+<pre><code>$
+$\frac{Common customers /total customers}{Product B customers / total customers}$
+$
+</code></pre>
+
+<p><strong>This is saying how much more likely customers are to purchase a product (Product) when they have already bought another related product (And Product)</strong></p>
+
+<pre><code class="language-jsx">Customers Lift = 
+DIVIDE (
+    [% Customers Confidence],
+    DIVIDE (
+        [# Customers And],
+        [# Customers Total]
+    )
+)
+</code></pre>
+
+<h3 id="attribution"><strong>Attribution</strong></h3>
+
+<p>This pattern is included in the book <a href="https://www.daxpatterns.com/books/dax-patterns-second-edition/"><strong>DAX Patterns, Second Edition</strong></a>. by [<strong>Alberto Ferrari](http://www.sqlbi.com/articles/author/alberto-ferrari/) and <a href="http://www.sqlbi.com/articles/author/marco-russo/">Marco Russo</a>.  I highly recommend their content. It’s excellent work. They are dedicated DAX teachers with comprehensive DAX knowledge. Their work is systematic and excellent.</strong></p>
+
+<h1 id="comment-on-the-power-bi-implementation">Comment on the Power BI Implementation</h1>
+
+<p>To be fully honest, DAX is not the best language to implement this analysis. First reason is that DAX’s advantage in Context Transitions complicated the code from both writer and report readers’ point of view.  Secondly, it is highly likely the data becomes so large that the report runs slow. The Power BI advantages in producing dynamic computation as user consumes the report doesn’t really shine in this situation.</p>
+
+<p>Instead, I find SQL implemtation is really easy to understand.</p>
+
+<h1 id="sql-implementation">SQL Implementation</h1>
+
+<p>This is based on schema of SAP Business One with SQL version v10.0
+The SalesAnalysis is a replicated view of the SAP stock sales anaysis report.</p>
+
+<pre><code class="language-sql">
+CREATE PROCEDURE [dbo].[BasketAnalysis]
+
+@CardCode NVARCHAR(50) = NULL,
+@LastNMonth INT = 12
+	 
+AS
+BEGIN
+
+DECLARE @AssoStartDate DATE = DATEFROMPARTS ( YEAR ( GETDATE()) -2, 1,1) 
+DECLARE @MinRepeatOrd INT = 2 -- Minimal repeated orders that a customer has to place for this item to be considered a regular item of a customer
+
+
+
+; WITH AssoCardCat AS (
+    SELECT 
+    T80.ItmsGrpNam, 
+    T80.CardCode, 
+    CAST ( COUNT(T80.CardCode) OVER (PARTITION BY T80.ItmsGrpNam ) AS DECIMAL(10,5) )[CatCustomers]
+    FROM 
+    (
+        SELECT 
+        T99.CardCode, 
+        T99.ItmsGrpNam,
+        COUNT ( DISTINCT T99.DocNum ) [OrdCount],
+        COUNT ( DISTINCT T99.itemCode) [ActiveLines]
+        FROM SalesAnalysis T99
+
+        WHERE
+        T99.DocDate &gt;= @AssoStartDate AND
+        T99.Sales &gt; 0 AND
+        T99.ItmsGrpCod NOT IN (158, 163, 229) AND
+        T99.ProjectCod IN ('WCT', 'CRE', 'EXP')
+
+        GROUP BY 
+        T99.CardCode, 
+        T99.ItmsGrpNam
+    ) T80 
+    WHERE T80.OrdCount &gt; @MinRepeatOrd
+) 
+, AssoCustomerCat AS 
+(
+	SELECT *
+	FROM 
+	(
+		SELECT
+		T99.*,
+		Prob_A		=  T99.CustomersforCatA/ T99.TotalCustomers , 
+		Prob_B		= T99.CustomersforCatB / T99.TotalCustomers,
+		Support		=	T99.CommonCustomers / T99.TotalCustomers,
+
+		Confidence	=	T99.CommonCustomers / T99.CustomersforCatA , -- Out of total A customers, how many are into B
+
+		Lift		=  (T99.CommonCustomers / T99.TotalCustomers )  / 
+					(( T99.CustomersforCatA/ T99.TotalCustomers)  * (  T99.CustomersforCatB / T99.TotalCustomers ) ), 
+		LiftRankInCat   = ROW_NUMBER() OVER 
+		(
+		  PARTITION BY T99.CategoryA
+		  ORDER BY (T99.CommonCustomers / T99.TotalCustomers )  / 
+					(( T99.CustomersforCatA/ T99.TotalCustomers)  * (  T99.CustomersforCatB / T99.TotalCustomers ) ) DESC  
+		)
+	
+		FROM 
+		(
+			SELECT 
+			T0.ItmsGrpNam [CategoryA], 
+			T0.CatCustomers [CustomersforCatA], 
+			T1.ItmsGrpNam [CategoryB], 
+			T1.CatCustomers [CustomersforCatB],
+			CAST ( COUNT ( T0.CardCode ) AS DECIMAL (10,5)) [CommonCustomers], 
+			TotalCustomers = 
+			(
+					SELECT COUNT( DISTINCT T0.CardCode) 
+					FROM SalesAnalysis T0 
+					WHERE
+					T0.DocDate &gt;= @AssoStartDate AND
+					T0.Sales &gt; 0 AND
+					T0.ItmsGrpCod NOT IN (158, 163, 229) AND
+					T0.ProjectCod IN ('WCT', 'CRE', 'EXP')
+			)
+
+			FROM AssoCardCat T0 
+			JOIN AssoCardCat T1 ON T1.CardCode = T0.CardCode AND T1.ItmsGrpNam &lt; T0.ItmsGrpNam
+			GROUP BY 
+			T0.ItmsGrpNam, T1.ItmsGrpNam, 
+			T0.CatCustomers, T1.CatCustomers
+		) T99 WHERE T99.CustomersforCatA != 0 AND T99.CustomersforCatB != 0
+	) T100 WHERE T100.Lift &gt; 1 
+), 
+CustomerSpecific AS 
+(
+	SELECT 
+	T100.* , 
+	SUM(T100.[CategorySpend]) OVER ()[TotalSpend], 
+	T100.[CategorySpend]  / SUM(T100.[CategorySpend]) OVER () [SpendPct], 
+	SpendRank = 
+	ROW_NUMBER () OVER (ORDER BY T100.[CategorySpend] DESC ) 
+	FROM 
+	(
+		SELECT 
+		SA.CardCode, 
+		SA.CardName, 
+		SA.ItmsGrpCod, 
+		SA.ItmsGrpNam, 
+		SUM(SA.Sales) [CategorySpend] 
+
+		FROM SalesAnalysis SA 
+		WHERE SA.CardCode = @CardCode
+		AND  
+		( 
+			SA.DocDate BETWEEN EOMONTH ( GETDATE(), -1 * @LastNMonth -1 ) AND GETDATE()
+		) 
+		AND SA.ItmsGrpCod NOT IN ( 229, 158, 163 ) 
+		GROUP BY SA.CardCode, 
+		SA.CardName, 
+		SA.ItmsGrpCod, 
+		SA.ItmsGrpNam
+	) T100 
+) 
+, FullReport AS 
+(
+	SELECT 
+	T0.*,
+	T1.CustomersforCatA [CustomersforCat], 
+	T1.CategoryB [RecommendCat], 
+	T1.CustomersforCatB [CustommersInRecommCat], 
+	T1.TotalCustomers, 
+	T1.Prob_A, 
+	T1.Prob_B, 
+	T1.Support,
+	T1.Confidence, 
+	T1.Lift 
+	--RecommLine = 
+	--T1.CategoryB + '(Confi: ' + CONVERT (NVARCHAR(10),  ROUND ( T1.Confidence * 100  ,0 )  ) 
+	--+  ' - Lift: ' + CONVERT (NVARCHAR(10),  ROUND ( T1.Lift * 100  ,0 )  ) + ')'
+	FROM CustomerSpecific T0 
+	LEFT JOIN AssoCustomerCat T1 ON T1.CategoryA = T0.ItmsGrpNam 
+	AND T1.CategoryB NOT IN 
+	(
+		SELECT 
+		T99.ItmsGrpNam
+		FROM CustomerSpecific T99
+	) 
+), 
+Overview AS 
+(
+	SELECT 
+	T0.CardCode, 
+	T0.CardName,
+	ROW_NUMBER() OVER (ORDER BY MAX( T0.Lift) DESC) [LiftRank],
+	ROW_NUMBER() OVER (ORDER BY MAX ( T0.Confidence) DESC ) [ConfiRank], 
+	T0.RecommendCat, 
+	T0.CustommersInRecommCat,
+	COUNT( T0.ItmsGrpNam ) BaseCount, 
+	-- STRING_AGG ( RecommLine, ',' ) BaseReason, 
+	MAX( T0.Lift) [MaxLift],
+	MAX(T0.Confidence) [MaxConfi]
+	FROM FullReport T0
+	WHERE T0.RecommendCat IS NOT NULL
+	GROUP BY T0.RecommendCat,
+	T0.CardCode, 
+	T0.CardName,
+	T0.CustommersInRecommCat
+)
+SELECT * FROM Overview
+END
+</code></pre>
+
+<h2 id="vesion-for-sales-mangers">Vesion for Sales Mangers</h2>
+
+<p>If all this is too complex for you and you are only interested in using this technique to analyst your own data and get insights from that. you can follow another post of mine.</p>
+
+<p><a href="/data/2024/11/04/basket-analysis-for-sales-managers.html">Basket Analysis for Sales Managers</a></p>]]></content><author><name>Joseph Cai</name></author><category term="data" /><category term="basket-analysis" /><category term="excel" /><category term="templates" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">Unlocking cross sales opportunities with pre-made Basket Analysis template</title><link href="https://no-arbitrage.github.io/no-arbitrage-old//data/2024/11/04/basket-analysis-for-sales-managers.html" rel="alternate" type="text/html" title="Unlocking cross sales opportunities with pre-made Basket Analysis template" /><published>2024-11-04T00:00:00+00:00</published><updated>2024-11-04T00:00:00+00:00</updated><id>https://no-arbitrage.github.io/no-arbitrage-old//data/2024/11/04/basket-analysis-for-sales-managers</id><content type="html" xml:base="https://no-arbitrage.github.io/no-arbitrage-old//data/2024/11/04/basket-analysis-for-sales-managers.html"><![CDATA[<p><img src="/assets/images/posts/jacek-dylag-jo8C9bt3uo8-unsplash.jpg" alt="banner" />
+Images: Jacek Dylag (unsplash.com)</p>
+
+<h2 id="goal">Goal</h2>
+
+<p>This post provides sales managers ability to run simple Basket Analysis insights on their own without having to request support from Data Analyst. Our goal is to offer practical, easy-to-implement strategies that help you drive performance and achieve measurable results.</p>
+
+<h2 id="key-idea">Key Idea</h2>
+
+<p>Basket analysis using Association Rule, involves understanding purchase patterns over time to see how products relate to each other within a customer’s buying journey. In this approach, each customer is viewed as a “basket,” meaning we analyze product relationships based on all items they’ve bought, across different orders. The purpose is to find patterns in what customers purchase together, over time, rather than in a single transaction.</p>
+
+<p>Key metrics, like <em>support</em>, <em>confidence</em>, and <em>lift</em>, are used to understand these product relationships:</p>
+
+<ul>
+  <li><strong>Support</strong>: The percentage of total customers who bought both items. It gives a sense of the prevalence of a combination in the overall population.</li>
+  <li><strong>Confidence</strong>: The likelihood that a customer who bought one product also bought another.</li>
+  <li><strong>Lift</strong>: The strength of the association between two products. A lift greater than 1 implies a meaningful association that could predict future purchases.</li>
+</ul>
+
+<p>For example, if “Computers” and “Cell phones” frequently appear in a customer’s purchase history, the analysis could reveal that customers who buy “Cell phones” have a high likelihood of also purchasing “Computers,” helping companies understand customer preferences and potentially guiding personalized marketing strategies.</p>
+
+<h2 id="additional-interests">Additional interests?</h2>
+
+<p>So, because the purpose of this article is to give sales manager a tool that they can just plug in with their own data to generate some reports, i am just going to focus on that. if you are interested in knowing more about this topic, feel free to move to another article of mine.</p>
+
+<p><a href="/data/2024/11/04/basket-analysis-for-data-analyst.html">Basket Analysis for Data analyst</a></p>
+
+<h2 id="template-plug-in-your-own-data">Template: Plug in your own data</h2>
+
+<p>There are detailed instructions in the file. I’ve tested with some of proprietary data I have access to, it worked. but in case yours throw errors, feel free to pin me an email with screenshot and I shall come back as soon as i can.</p>
+
+<p>File Attachment: <a href="https://no-arbitrage.github.io/no-arbitrage-old//assets/xlsx/Basket-analysis-Basic.xlsx">Basket analysis - Basic.xlsx</a></p>]]></content><author><name>Joseph Cai</name></author><category term="data" /><category term="basket-analysis" /><category term="excel" /><category term="templates" /><summary type="html"><![CDATA[Images: Jacek Dylag (unsplash.com)]]></summary></entry><entry><title type="html">Free Power Bi template - a showcase of dashboard development</title><link href="https://no-arbitrage.github.io/no-arbitrage-old//data/2024/11/04/basket-free-power-bi-template-showcase.html" rel="alternate" type="text/html" title="Free Power Bi template - a showcase of dashboard development" /><published>2024-11-04T00:00:00+00:00</published><updated>2024-11-04T00:00:00+00:00</updated><id>https://no-arbitrage.github.io/no-arbitrage-old//data/2024/11/04/basket-free-power-bi-template-showcase</id><content type="html" xml:base="https://no-arbitrage.github.io/no-arbitrage-old//data/2024/11/04/basket-free-power-bi-template-showcase.html"><![CDATA[<h1 id="power-bi-dax-implementation">Power BI (DAX) Implementation</h1>
+
+<h2 id="goal">Goal</h2>
+
+<p>This post is share my experience of developing power bi dashboard. I will find another time to discuss the internal working, data model and other bits around power bi development with you. In this post, I will just share the file with you. You can do whatever you want with this file.</p>
+
+<p>I taught myself the skills around this work in the last three years, if anything I did in the posts I shared is considered less optimal, I am more than happy to learn from you. Please don’t hestate to point out for me! I appreciate that kind guesture.</p>
+
+<p>I couldn’t post my work that’s done for my last employer because privacy reasons. All the information I shared in this post is purely sourced from internet and you don’t need to worry about the patent issues.</p>
+
+<h2 id="screenshots">Screenshots</h2>
+
+<p>Here are some screenshots.</p>
+
+<p><img src="/assets/images/screenshot/241104_powerbi_Slide3.jpeg" alt="Overview" />
+<img src="/assets/images/screenshot/241104_powerbi_Slide4.jpeg" alt="Disclaimer" />
+<img src="/assets/images/screenshot/241104_powerbi_Slide5.jpeg" alt="OneReportToRuleThemAll" />
+<img src="/assets/images/screenshot/241104_powerbi_Slide6.jpeg" alt="BasketAnalysis" /></p>
+
+<h2 id="file-download">File Download</h2>
+
+<p>Attachment: <a href="https://no-arbitrage.github.io/no-arbitrage-old//assets/pbix/241103_AdventureWorks_na.pbix">241103_AdventureWorks_na.pbix</a></p>]]></content><author><name>Joseph Cai</name></author><category term="data" /><category term="basket-analysis" /><category term="excel" /><category term="templates" /><summary type="html"><![CDATA[Power BI (DAX) Implementation]]></summary></entry><entry><title type="html">Causation between ESG and Profitability.</title><link href="https://no-arbitrage.github.io/no-arbitrage-old//esg/2024/10/30/Causation-between-ESG-and-Profitability.html" rel="alternate" type="text/html" title="Causation between ESG and Profitability." /><published>2024-10-30T00:00:00+00:00</published><updated>2024-10-30T00:00:00+00:00</updated><id>https://no-arbitrage.github.io/no-arbitrage-old//esg/2024/10/30/Causation-between-ESG-and-Profitability</id><content type="html" xml:base="https://no-arbitrage.github.io/no-arbitrage-old//esg/2024/10/30/Causation-between-ESG-and-Profitability.html"><![CDATA[<h1 id="the-causation-effect-between-esg-and-profitability">The Causation Effect between ESG and Profitability</h1>
+<h2 id="one-step-causation-and-self-reinforcing-cycles">One-Step Causation and Self-Reinforcing Cycles</h2>
+
+<p>In Damodaran’s post and video session about ESG, he often highlights the causation between being “good” (practicing strong ESG principles) and being “profitable.” It is true that many articles claim companies with good ESG practices are more likely to achieve superior profitability. However, the causation direction may be different. It could be that companies with higher profitability simply have more resources to brush up their ESG marketing and practices.</p>
+
+<p>This perspective raises the classic statistical pitfall of <strong>reverse causation</strong> or <strong>endogeneity</strong>, where it’s unclear if ESG practices lead to profitability or if profitability enables stronger ESG initiatives. However, if we focus solely on causation direction, we risk missing the broader point.</p>
+
+<h3 id="mutually-reinforcing-cycles">Mutually Reinforcing Cycles</h3>
+<p>There is a type of relationship like this often described as <strong>mutually reinforcing</strong> or <strong>self-reinforcing cycles</strong>. In this dynamic, two factors drive each other in a continuous loop, making it difficult (or irrelevant) to determine which is the true origin. Instead of focusing on the “first cause,” the key is to engage with the cycle to achieve a desired outcome.</p>
+
+<p>For example:</p>
+<ul>
+  <li><strong>Companies with strong ESG practices</strong> may experience enhanced reputations, customer loyalty, and operational efficiencies that improve profitability.</li>
+  <li><strong>Increased profitability</strong>, in turn, provides companies with more resources to further invest in or promote their ESG practices.</li>
+</ul>
+
+<p>This cycle creates a feedback loop where both ESG and profitability can grow together, and the origin point becomes less relevant than engaging with the cycle to produce desired results.</p>
+
+<h3 id="statistical-testing-for-self-reinforcing-cycles">Statistical Testing for Self-Reinforcing Cycles</h3>
+<p>To analyze this type of relationship, several statistical tests and models are well-suited for examining the reciprocal or cyclical influence of ESG and profitability:</p>
+
+<ol>
+  <li>
+    <p><strong>Cross-Lagged Panel Analysis</strong><br />
+This test uses time-lagged data to analyze if each variable predicts changes in the other over time.</p>
+  </li>
+  <li>
+    <p><strong>Vector Autoregression (VAR)</strong><br />
+A dynamic model that allows each variable to be expressed as a function of its own past values and the past values of the other variable, revealing potential reinforcement.</p>
+  </li>
+  <li>
+    <p><strong>Structural Equation Modeling (SEM)</strong><br />
+SEM can help model the complex, bi-directional relationship between ESG and profitability, including indirect effects and latent variables that might influence both.</p>
+  </li>
+  <li>
+    <p><strong>Granger Causality Test</strong><br />
+Running this test in both directions (e.g., from ESG to profitability and vice versa) can provide preliminary insights into whether changes in one precede the other, even if it does not confirm true causation.</p>
+  </li>
+</ol>
+
+<h3 id="big-picture-takeaway">Big Picture Takeaway</h3>
+<p>Instead of identifying a single cause, the goal is to understand and leverage the ESG-profitability cycle to support a company’s long-term objectives. This perspective encourages a pragmatic approach where the focus shifts to participating in and amplifying the cycle rather than proving which factor is primary. This way, companies can create a sustainable impact that aligns ESG goals with financial performance.</p>]]></content><author><name>Joseph Cai</name></author><category term="ESG" /><category term="Idea" /><category term="Comment" /><summary type="html"><![CDATA[The Causation Effect between ESG and Profitability One-Step Causation and Self-Reinforcing Cycles]]></summary></entry><entry><title type="html">You Don’t Have an ESG Strategy</title><link href="https://no-arbitrage.github.io/no-arbitrage-old//esg/corporatestrategy/2024/10/29/You-don-t-have-a-esg-strategy.html" rel="alternate" type="text/html" title="You Don’t Have an ESG Strategy" /><published>2024-10-29T00:00:00+00:00</published><updated>2024-10-29T00:00:00+00:00</updated><id>https://no-arbitrage.github.io/no-arbitrage-old//esg/corporatestrategy/2024/10/29/You-don-t-have-a-esg-strategy</id><content type="html" xml:base="https://no-arbitrage.github.io/no-arbitrage-old//esg/corporatestrategy/2024/10/29/You-don-t-have-a-esg-strategy.html"><![CDATA[<h2 id="strategy-is-not-planning">Strategy is not Planning</h2>
+<p>Many consultants offer ESG planning but often label it as an ESG strategy. It’s crucial to understand the difference.</p>
+
+<p>In the strategy world, the distinction between strategy and planning is well-defined. <strong>Strategy is not planning.</strong> Strategy is about making hard choices; planning is about organizing actions. ESG’s popularity may partly stem from its planning nature, which promises a single direction—becoming more ethical, responsible, and sustainable. This approach reassures executives in the boardroom. It’s straightforward, and people tend to favor straightforward solutions. Strategy, however, demands a set of coherent, risky choices that allow a business to differentiate itself from competitors, often by deciding <em>not</em> to compete on certain fronts. This is challenging.</p>
+
+<p>If companies truly aim for an ESG strategy, rather than mere planning, their focus must be tailored to their current stage of development. This shifts the question for executives from:</p>
+
+<blockquote>
+  <p>“What parameters are others using to rate companies, and how can we implement actions to score well?”</p>
+</blockquote>
+
+<p>to:</p>
+
+<blockquote>
+  <p>“Which ESG factors matter most to our specific business context? How can we leverage our unique resources and strengths to create meaningful, sustainable impacts for our stakeholders?”</p>
+</blockquote>
+
+<p>By targeting the ESG factors that align with the company’s strengths and position, executives not only build a positive impact that may be harder for competitors to replicate, but they also enhance their strategic position. This approach offers a genuine source of competitive advantage, setting the business apart.</p>
+
+<h2 id="esg-marketing-isnt-a-long-term-solution-to-corproate-social-responsibility">ESG Marketing isn’t a Long-term Solution to Corproate Social Responsibility.</h2>
+
+<p>While ESG marketing can temporarily bolster a company’s reputation, it lacks the depth and long-term impact of authentic CSR practices and can backfire if the company fails to deliver on its promises.</p>
+
+<h2 id="embracing-accountability">Embracing accountability</h2>]]></content><author><name>Joseph Cai</name></author><category term="ESG" /><category term="CorporateStrategy" /><category term="ESG" /><summary type="html"><![CDATA[Strategy is not Planning Many consultants offer ESG planning but often label it as an ESG strategy. It’s crucial to understand the difference.]]></summary></entry><entry><title type="html">Welcome to No Arbitrage!</title><link href="https://no-arbitrage.github.io/no-arbitrage-old//planning/2024/10/14/welcome-to-my-first-blog.html" rel="alternate" type="text/html" title="Welcome to No Arbitrage!" /><published>2024-10-14T00:00:00+00:00</published><updated>2024-10-14T00:00:00+00:00</updated><id>https://no-arbitrage.github.io/no-arbitrage-old//planning/2024/10/14/welcome-to-my-first-blog</id><content type="html" xml:base="https://no-arbitrage.github.io/no-arbitrage-old//planning/2024/10/14/welcome-to-my-first-blog.html"><![CDATA[<h2 id="welcome">Welcome</h2>
+
+<p>Hello! I am thrilled that you are here! This is my first and latest blog where I will share my thoughts on financial market and financial fundamental knowledge and occassionally practical example files (models and slides). You can find more about me in the ABOUT page.</p>
+
+<p>To add new posts, simply add a file in the <code>_posts</code> directory that follows the convention <code>YYYY-MM-DD-name-of-post.ext</code> and includes the necessary front matter. Take a look at the I</p>
+
+<h2 id="topic-schedule">Topic Schedule</h2>
+<p>There is a list of topics that I already have in mind that I would lilke to share and hopefully gather your thoughts.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Topic</th>
+      <th>Descriptions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Corporate Finance 101</td>
+      <td>Fundamental framework of classic topics in Corporate Finance.</td>
+    </tr>
+    <tr>
+      <td>Business Model 101</td>
+      <td>A easy to apply framework for any types of business</td>
+    </tr>
+    <tr>
+      <td>Often Mistakes in Valuation</td>
+      <td>Maybe opinionated</td>
+    </tr>
+    <tr>
+      <td>Automate model updates with Power Query</td>
+      <td>One click updates all</td>
+    </tr>
+    <tr>
+      <td>Sales Dashboard End to End showcase</td>
+      <td>Power BI and standard dataset</td>
+    </tr>
+    <tr>
+      <td>Book recommendation</td>
+      <td>Building a StoryBrand by Donald Miller</td>
+    </tr>
+    <tr>
+      <td>Book recommendation</td>
+      <td>The Synergy Solution by Mark Sirower, Jeff Weirens</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="what-youd-be-interested-in">What you’d be interested in</h2>
+<p>Please feel free to reach out to me on LinkedIn to let me know your thoughts and make any recommendations if you have.</p>
+
+<!-- Check out the [Jekyll docs][jekyll-docs] for more info on how to get the most out of Jekyll. File all bugs/feature requests at [Jekyll’s GitHub repo][jekyll-gh]. If you have questions, you can ask them on [Jekyll Talk][jekyll-talk].
+
+[jekyll-docs]: https://jekyllrb.com/docs/home
+[jekyll-gh]: https://github.com/jekyll/jekyll
+[jekyll-talk]: https://talk.jekyllrb.com/ -->]]></content><author><name>Joseph</name></author><category term="Planning" /><category term="topics" /><category term="summary" /><summary type="html"><![CDATA[Welcome]]></summary></entry></feed>
